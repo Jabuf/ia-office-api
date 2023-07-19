@@ -52,6 +52,7 @@
     "@fastify/helmet": "^10.1.0",
     "@fastify/middie": "^8.1.0",
     "@prisma/client": "4.6.1",
+    "chatgpt": "^5.2.5",
     "dotenv": "^16.0.3",
     "fastify": "^4.13.0",
     "openai": "^3.3.0",

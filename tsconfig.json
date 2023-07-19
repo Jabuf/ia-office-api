@@ -16,6 +16,9 @@
     "strict": true,
     /* Allows importing modules with a ‘.json’ extension */
     "resolveJsonModule": true,
+    "types": [
+      "vitest/globals"
+    ],
     /* Skip type checking all .d.ts files. This can save time during compilation at the expense of type-system accuracy. */
     "skipLibCheck": true
   },
