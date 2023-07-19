@@ -25,4 +25,18 @@ export default abstract class ChatGptApiUtils {
     this.convID = res.id
     return res.text
   }
+
+  static extractCode(chatGptAnswer: string, language = 'javascript'): string[] {
+    const codeBlocks: string[] = []
+    const codeSeparator = '```'
+    const arr = chatGptAnswer.split(codeSeparator)
+
+    arr.forEach((str) => {
+      if (str.split('\n')[0].trim() === language) {
+        codeBlocks.push(str.substring(str.indexOf('\n')))
+      }
+    })
+
+    return codeBlocks
+  }
 }
