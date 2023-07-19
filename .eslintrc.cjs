@@ -8,6 +8,7 @@ module.exports = {
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "prettier"
       ],
       parserOptions: {
         tsconfigRootDir: __dirname,
@@ -17,6 +18,7 @@ module.exports = {
   ],
   rules: {
     'no-console': 'error',
+    semi: ['error', 'never']
   },
   root: true
 };
