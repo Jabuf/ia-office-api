@@ -42,7 +42,6 @@ export async function startServer() {
     // Register the routes
     customLogger.info(`Routes registered${server.printRoutes()}`)
 
-    // TODO improves error handling
     server.setErrorHandler((error, request, reply) => {
       server.log.error(error)
     })
