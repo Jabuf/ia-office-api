@@ -55,6 +55,8 @@
     "chatgpt": "^5.2.5",
     "dotenv": "^16.0.3",
     "fastify": "^4.13.0",
+    "google-auth-library": "^8.9.0",
+    "googleapis": "^122.0.0",
     "openai": "^3.3.0",
     "pino": "^8.11.0",
     "radash": "^10.7.0",
