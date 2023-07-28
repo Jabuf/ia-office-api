@@ -1,5 +1,6 @@
 import { google } from 'googleapis'
 import GoogleApiUtils from './GoogleApiUtils'
+import vm from 'vm'
 
 export default abstract class SheetsApiUtils extends GoogleApiUtils {
   static sheets = google.sheets({
@@ -16,5 +17,17 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
       },
     })
     return spreadSheets.data.spreadsheetId || ''
+  }
+
+  static async updateSpreadsheets(code: string) {
+    const codeToRun = `const { sheets } = this;
+      ${code}`
+    const context = {
+      sheets: this.sheets,
+      codeToRun,
+    }
+
+    const script = new vm.Script(codeToRun)
+    await script.runInNewContext(context)
   }
 }
