@@ -7,7 +7,7 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
     auth: this.client,
   })
 
-  static async createSpreadSheets(fileName: string) {
+  static async createSpreadSheets(fileName: string): Promise<string> {
     const spreadSheets = await this.sheets.spreadsheets.create({
       requestBody: {
         properties: {
@@ -15,6 +15,6 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
         },
       },
     })
-    return spreadSheets.data.spreadsheetId
+    return spreadSheets.data.spreadsheetId || ''
   }
 }

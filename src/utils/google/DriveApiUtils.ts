@@ -6,4 +6,10 @@ export default abstract class DriveApiUtils extends GoogleApiUtils {
     version: 'v3',
     auth: this.client,
   })
+
+  static async retrieveFile(id: string) {
+    return this.drive.files.get({
+      fileId: id,
+    })
+  }
 }
