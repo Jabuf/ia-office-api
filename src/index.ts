@@ -4,10 +4,12 @@ import helmet from '@fastify/helmet'
 import cors from '@fastify/cors'
 import middleware from '@fastify/middie'
 import xXssProtection from 'x-xss-protection'
-import {customLogger} from './utils/logging/customLogger'
+import { customLogger } from './utils/logging/customLogger'
 import dotenv from 'dotenv'
-import {PrismaClientUtils} from './utils/db/PrismaClientUtils'
-import {PrismaClient} from '@prisma/client'
+import { PrismaClientUtils } from './utils/db/PrismaClientUtils'
+import { PrismaClient } from '@prisma/client'
+import sheetsRouter from './routes/sheets'
+import { ApiPrefixes } from './routes/urlConstants'
 
 dotenv.config()
 
@@ -40,6 +42,7 @@ export async function startServer() {
     server.use(xXssProtection())
 
     // Register the routes
+    await server.register(sheetsRouter, { prefix: ApiPrefixes.V1 })
     customLogger.info(`Routes registered${server.printRoutes()}`)
 
     server.setErrorHandler((error, request, reply) => {

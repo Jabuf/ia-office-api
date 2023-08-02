@@ -16,12 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/Jabuf/ia-office-api.git"
   },
-  "keywords": [
-    "legal",
-    "gdpr",
-    "legaltech",
-    "legal-documents"
-  ],
+  "keywords": [],
   "author": "J&L",
   "license": "MIT",
   "bugs": {
@@ -55,6 +50,7 @@
     "chatgpt": "^5.2.5",
     "dotenv": "^16.0.3",
     "fastify": "^4.13.0",
+    "gaxios": "^6.0.3",
     "google-auth-library": "^8.9.0",
     "googleapis": "^122.0.0",
     "openai": "^3.3.0",
