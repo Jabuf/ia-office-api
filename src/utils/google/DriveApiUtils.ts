@@ -12,6 +12,7 @@ export default abstract class DriveApiUtils extends GoogleApiUtils {
   static async retrieveFile(id: string): Promise<GaxiosPromise<Schema$File>> {
     return this.drive.files.get({
       fileId: id,
+      fields: 'webContentLink, webViewLink',
     })
   }
 }

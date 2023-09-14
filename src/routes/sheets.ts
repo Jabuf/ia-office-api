@@ -11,6 +11,11 @@ async function sheetsRouter(fastify: FastifyInstance) {
     url: basePath,
     handler: sheetsController.create,
   })
+  fastify.route({
+    method: 'GET',
+    url: basePath,
+    handler: sheetsController.get,
+  })
 }
 
 export default sheetsRouter
