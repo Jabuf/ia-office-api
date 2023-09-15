@@ -32,9 +32,8 @@ export async function startServer() {
     // Middlewares managed by a @fastify package
     await server.register(helmet)
     // https://github.com/fastify/fastify-cors#options
-    customLogger.info(whitelist)
     await server.register(cors, {
-      origin: whitelist,
+      origin: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
     })
 
