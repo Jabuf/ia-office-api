@@ -10,6 +10,7 @@ import { PrismaClientUtils } from './utils/db/PrismaClientUtils'
 import { PrismaClient } from '@prisma/client'
 import sheetsRouter from './routes/sheets'
 import { ApiPrefixes } from './routes/urlConstants'
+import modelRouter from './routes/model'
 
 dotenv.config()
 
@@ -33,7 +34,7 @@ export async function startServer() {
     await server.register(helmet)
     // https://github.com/fastify/fastify-cors#options
     await server.register(cors, {
-      origin: '*',
+      origin: whitelist,
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
     })
 
@@ -42,6 +43,7 @@ export async function startServer() {
     server.use(xXssProtection())
 
     // Register the routes
+    await server.register(modelRouter, { prefix: ApiPrefixes.V1 })
     await server.register(sheetsRouter, { prefix: ApiPrefixes.V1 })
     customLogger.info(`Routes registered${server.printRoutes()}`)
 
