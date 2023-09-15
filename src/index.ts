@@ -33,7 +33,7 @@ export async function startServer() {
     await server.register(helmet)
     // https://github.com/fastify/fastify-cors#options
     await server.register(cors, {
-      origin: true,
+      origin: whitelist,
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
     })
 
