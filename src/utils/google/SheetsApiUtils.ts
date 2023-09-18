@@ -1,7 +1,8 @@
+import vm from 'vm'
 import { google } from 'googleapis'
 import GoogleApiUtils from './GoogleApiUtils'
-import vm from 'vm'
 import DriveApiUtils from './DriveApiUtils'
+import { customLogger } from '../logging/customLogger'
 
 export default abstract class SheetsApiUtils extends GoogleApiUtils {
   static sheets = google.sheets({
@@ -32,11 +33,14 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
 
   static async updateSpreadsheets(code: string) {
     const codeToRun = `const { sheets } = this;
-      ${code}`
+      async function updateSpreadsheets() { ${code} }
+      updateSpreadsheets();
+      `
     const context = {
       sheets: this.sheets,
       codeToRun,
     }
+    customLogger.info(codeToRun)
 
     const script = new vm.Script(codeToRun)
     await script.runInNewContext(context)
