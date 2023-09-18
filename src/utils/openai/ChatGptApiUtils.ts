@@ -3,6 +3,11 @@ import { ChatGPTAPI } from 'chatgpt'
 
 dotenv.config()
 
+export type GPTResponse = {
+  response: string
+  id: string
+}
+
 export default abstract class ChatGptApiUtils {
   private static chatGptApi = new ChatGPTAPI({
     apiKey: process.env.OPENAI_API_KEY ?? '',
@@ -10,20 +15,26 @@ export default abstract class ChatGptApiUtils {
       model: process.env.OPENAI_DEFAULT_MODEL ?? '',
     },
   })
-  private static convID: string
 
-  static async startConv(message: string): Promise<string> {
+  static async startConv(message: string): Promise<GPTResponse> {
     const res = await this.chatGptApi.sendMessage(message)
-    this.convID = res.id
-    return res.text
+    return {
+      response: res.text,
+      id: res.id,
+    }
   }
 
-  static async pursueExistingConv(message: string): Promise<string> {
+  static async pursueExistingConv(
+    parentMessageId: string,
+    message: string,
+  ): Promise<GPTResponse> {
     const res = await this.chatGptApi.sendMessage(message, {
-      parentMessageId: this.convID,
+      parentMessageId,
     })
-    this.convID = res.id
-    return res.text
+    return {
+      response: res.text,
+      id: res.id,
+    }
   }
 
   static extractCode(chatGptAnswer: string, language = 'javascript'): string[] {

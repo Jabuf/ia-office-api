@@ -1,6 +1,7 @@
 import { google } from 'googleapis'
 import GoogleApiUtils from './GoogleApiUtils'
 import vm from 'vm'
+import DriveApiUtils from './DriveApiUtils'
 
 export default abstract class SheetsApiUtils extends GoogleApiUtils {
   static sheets = google.sheets({
@@ -14,6 +15,16 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
         properties: {
           title: fileName,
         },
+      },
+    })
+
+    // We make add permissions to the spreadsheet for everyone
+    // https://developers.google.com/drive/api/guides/ref-roles
+    await DriveApiUtils.drive.permissions.create({
+      fileId: spreadSheets.data.spreadsheetId ?? '',
+      requestBody: {
+        role: 'writer',
+        type: 'anyone',
       },
     })
     return spreadSheets.data.spreadsheetId || ''
