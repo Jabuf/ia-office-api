@@ -50,4 +50,13 @@ export default abstract class ChatGptApiUtils {
 
     return codeBlocks
   }
+
+  static extractList(chatGptAnswer: string): string[] {
+    const list = JSON.parse(
+      this.extractCode(chatGptAnswer, 'json')[0],
+    ) as unknown as {
+      answers: string[]
+    }
+    return list.answers
+  }
 }

@@ -11,4 +11,9 @@ export default async function modelRouter(fastify: FastifyInstance) {
     url: basePath,
     handler: modelController.createSpreadsheet,
   })
+  fastify.route({
+    method: 'GET',
+    url: basePath,
+    handler: modelController.collectInformation,
+  })
 }
