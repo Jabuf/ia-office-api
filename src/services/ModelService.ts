@@ -19,7 +19,9 @@ export class ModelService {
     const initialPrompt = `I will give you a prompt that have for goal the creation of a spreadsheet.
         I want you to give me an exhaustive list of information I could put in that spreadsheet, like tables, sheets or graphs.
         I want the label in your answers to use the same language used in the prompt while you'll continue to converse with me in English.
-        The prompt is : "${data.prompt}"`
+        The prompt is "${
+          data.prompt
+        }" and the list of additional information is "${data.additionalInfo.toString()}". Among additional information, ignore question that have no answers.`
     const parentRes = await ChatGptApiUtils.startConv(initialPrompt)
     // Step 1
     const codePrompt = `Now I want to put all the information you just provided to me in a spreadsheet, including graphs, sheets and examples for values.
@@ -40,6 +42,7 @@ export class ModelService {
           be careful to escape special characters, especially the ' symbol;
           don't forget to add data for the graphs;
           keep the code as short as possible (i.e no comments or no console.log);
+          try to get every id dynamically, for example get the id of a sheet from its name;
           since you're not necessarily up to date, I want you to use the official documentation (https://developers.google.com/sheets/api/) as much as possible.
 
         For the first step I want you to only create the sheets.
@@ -84,8 +87,9 @@ export class ModelService {
 
   async collectInformation(data: Conv): Promise<Conv> {
     const initialPrompt = `My goal is to create of a spreadsheet.
-          I'll later ask you to give me an exhaustive list of information that I could put in that spreadsheet, like tables, sheets or graphs.
-          But first I want you to give me a list of information that related to this creation and that I could give you to help you with this task.
+          I'll later ask you to give me exhaustive information that I could put in that spreadsheet, like tables, sheets or graphs.
+          But first I want you to give me a list of shorts questions that are related to this creation and that I could answer to help you with this task.
+          The answer to a question should be simple and short, otherwise don't ask for it.
           I want the answers in the list to use the same language as the one used in the purpose while you'll continue to converse with me in English.
           Your answer must contain an explicit block of code in json (starting with \`\`\`json) that will contain the list. The type inside that block must be "{answers : string[]}".
           The purpose of my spreadsheet is : "${data.prompt}"`
