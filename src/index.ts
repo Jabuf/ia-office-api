@@ -4,7 +4,7 @@ import helmet from '@fastify/helmet'
 import cors from '@fastify/cors'
 import middleware from '@fastify/middie'
 import xXssProtection from 'x-xss-protection'
-import { customLogger } from './utils/logging/customLogger'
+import { logger } from './utils/logging/logger'
 import dotenv from 'dotenv'
 import { PrismaClientUtils } from './utils/db/PrismaClientUtils'
 import { PrismaClient } from '@prisma/client'
@@ -27,7 +27,7 @@ export let prismaClient: PrismaClient
 export async function startServer() {
   try {
     const server = await fastify({
-      logger: customLogger,
+      logger: logger,
     })
 
     // Middlewares managed by a @fastify package
@@ -45,7 +45,7 @@ export async function startServer() {
     // Register the routes
     await server.register(modelRouter, { prefix: ApiPrefixes.V1 })
     await server.register(sheetsRouter, { prefix: ApiPrefixes.V1 })
-    customLogger.info(`Routes registered${server.printRoutes()}`)
+    logger.info(`Routes registered${server.printRoutes()}`)
 
     server.setErrorHandler((error, request, reply) => {
       server.log.error(error)
@@ -56,7 +56,7 @@ export async function startServer() {
         process.on(signal, () => {
           void (async () => {
             await server.close().then((err) => {
-              customLogger.error(`close application on ${signal}`)
+              logger.error(`close application on ${signal}`)
               process.exit(err ? 1 : 0)
             })
           })()
@@ -64,19 +64,19 @@ export async function startServer() {
       }
     }
 
-    customLogger.info('Starting the prisma client')
+    logger.info('Starting the prisma client')
     prismaClient = await PrismaClientUtils.initPrismaClient()
-    customLogger.info('The prisma client has been successfully started!')
+    logger.info('The prisma client has been successfully started!')
 
     // Starting the server
     await server.listen({ port: Number(port), host })
 
     process.on('uncaughtException' || 'unhandledRejection', (err) => {
-      customLogger.error(err)
+      logger.error(err)
       process.exit(1)
     })
   } catch (e) {
-    customLogger.error(e)
+    logger.error(e)
   }
 }
 

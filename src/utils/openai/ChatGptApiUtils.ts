@@ -4,7 +4,7 @@ import { ChatGPTAPI } from 'chatgpt'
 dotenv.config()
 
 export type GPTResponse = {
-  response: string
+  answer: string
   id: string
 }
 
@@ -14,12 +14,14 @@ export default abstract class ChatGptApiUtils {
     completionParams: {
       model: process.env.OPENAI_DEFAULT_MODEL ?? '',
     },
+    systemMessage:
+      'Your answers must be under 4000 characters, try to be as concise as possible.',
   })
 
   static async startConv(message: string): Promise<GPTResponse> {
     const res = await this.chatGptApi.sendMessage(message)
     return {
-      response: res.text,
+      answer: res.text,
       id: res.id,
     }
   }
@@ -32,7 +34,7 @@ export default abstract class ChatGptApiUtils {
       parentMessageId,
     })
     return {
-      response: res.text,
+      answer: res.text,
       id: res.id,
     }
   }
@@ -47,16 +49,11 @@ export default abstract class ChatGptApiUtils {
         codeBlocks.push(str.substring(str.indexOf('\n')))
       }
     })
-
     return codeBlocks
   }
 
   static extractList(chatGptAnswer: string): string[] {
-    const list = JSON.parse(
-      this.extractCode(chatGptAnswer, 'json')[0],
-    ) as unknown as {
-      answers: string[]
-    }
-    return list.answers
+    return (JSON.parse(chatGptAnswer) as unknown as { answers: string[] })
+      .answers
   }
 }

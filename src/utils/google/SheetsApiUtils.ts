@@ -2,7 +2,7 @@ import vm from 'vm'
 import { google } from 'googleapis'
 import GoogleApiUtils from './GoogleApiUtils'
 import DriveApiUtils from './DriveApiUtils'
-import { customLogger } from '../logging/customLogger'
+import { logger } from '../logging/logger'
 
 export default abstract class SheetsApiUtils extends GoogleApiUtils {
   static sheets = google.sheets({
@@ -40,7 +40,7 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
       sheets: this.sheets,
       codeToRun,
     }
-    customLogger.info(codeToRun)
+    logger.info(`codeRun : ${codeToRun}`)
 
     const script = new vm.Script(codeToRun)
     await script.runInNewContext(context)
