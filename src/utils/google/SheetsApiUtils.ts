@@ -31,8 +31,9 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
     return spreadSheets.data.spreadsheetId || ''
   }
 
-  static async updateSpreadsheets(code: string) {
+  static async updateSpreadsheets(spreadsheetId: string, code: string) {
     const codeToRun = `const { sheets } = this;
+    const spreadsheetId = '${spreadsheetId}';
       async function updateSpreadsheets() { ${code} }
       updateSpreadsheets();
       `

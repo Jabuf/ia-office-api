@@ -13,9 +13,6 @@ export class ModelService {
   }
 
   async createSpreadsheet(data: Conv): Promise<DriveFileUrls> {
-    const id = await SheetsApiUtils.createSpreadSheets(
-      new Date().toLocaleDateString(),
-    )
     const initialPrompt = `I will give you a prompt that have for goal the creation of a spreadsheet.
         I want you to give me an exhaustive list of information I could put in that spreadsheet, like tables, sheets or graphs.
         I want the label in your answers to use the same language used in the prompt while you'll continue to converse with me in English.
@@ -23,6 +20,10 @@ export class ModelService {
           data.prompt
         }" and the list of additional information is "${data.additionalInfo.toString()}". Among additional information, ignore question that have no answers.`
     const parentRes = await ChatGptApiUtils.startConv(initialPrompt)
+
+    const id = await SheetsApiUtils.createSpreadSheets(
+      parentRes.id.substring(8),
+    )
     // Step 1
     const codePrompt = `Now I want to put all the information you just provided to me in a spreadsheet, including graphs, sheets and examples for values.
         We'll be using the Sheets API in nodejs and want you to provide me with blocks of code.
@@ -35,9 +36,10 @@ export class ModelService {
 
         I'll now give you instructions that you must respect for each steps.
         I'll give you some instructions for your code :
-          The spreadsheet is already created and has the id : ${id}, start each block by declaring it;
+          the variable for the id of the spreadsheet is already created and called 'spreadsheetId', use it directly and consequently never create another variable named spreadsheetId;
+          I've already a sheets object that is responsible for the connection to the API client, use it directly and consequently never create another variable named sheets;
+          don't use variables that need to be declared before executing the block, unless I've told you to use them, like spreadsheetId or sheets;
           ensure that you have created the functions you use;
-          I've already a sheets object that is responsible for the connection to the API client, so use it directly and consequently never create another variables named sheets;
           you shouldn't import packages, the sheets object is enough as an entry point;
           don't forget to use the await keyword;
           be careful to escape special characters, especially the ' symbol;
@@ -49,28 +51,28 @@ export class ModelService {
         For the first step I want you to only create the sheets.
       `
     let res = await ChatGptApiUtils.pursueExistingConv(parentRes.id, codePrompt)
-    await this.updateSpreadsheets(res.answer)
+    await this.updateSpreadsheets(id, res.answer)
     // Step 2
     res = await ChatGptApiUtils.pursueExistingConv(
       res.id,
       // `For the second step I want you to populate the sheets with tables. You don't need to add data to the tables yet, however I'd like if they can be stylized with colors, borders, fonts, etc.`,
-      `For the second step I want you to populate the sheets with tables. You don't need to add data to the tables yet.`,
+      `For the second step I want you to create the tables in each sheet and populate them with examples.`,
     )
-    await this.updateSpreadsheets(res.answer)
+    await this.updateSpreadsheets(id, res.answer)
 
-    // Step 3
-    res = await ChatGptApiUtils.pursueExistingConv(
-      res.id,
-      `For the third step I want you to populate these tables with dummy values.`,
-    )
-    await this.updateSpreadsheets(res.answer)
+    // // Step 3
+    // res = await ChatGptApiUtils.pursueExistingConv(
+    //   res.id,
+    //   `For the third step I want you to populate these tables with dummy values.`,
+    // )
+    // await this.updateSpreadsheets(id, res.answer)
 
-    // Step 4
-    res = await ChatGptApiUtils.pursueExistingConv(
-      res.id,
-      `For the fourth step I want you to add graphs when it's relevant.`,
-    )
-    await this.updateSpreadsheets(res.answer)
+    // // Step 4
+    // res = await ChatGptApiUtils.pursueExistingConv(
+    //   res.id,
+    //   `For the fourth step I want you to add graphs when it's relevant.`,
+    // )
+    // await this.updateSpreadsheets(id, res.answer)
 
     return this.sheetsService.getById(id)
   }
@@ -84,7 +86,7 @@ export class ModelService {
           Your answer must contain a block of code in json which start with \`\`\`json, it will contain the list. The type inside that block must be "{answers : string[]}".
           The purpose of my spreadsheet is : "${data.prompt}"`
     const parentRes = await ChatGptApiUtils.startConv(initialPrompt)
-    logger.info(`answer: ${parentRes.answer}`)
+    logger.info(`conv: ${JSON.stringify(parentRes)}`)
 
     data.additionalInfo = ChatGptApiUtils.extractList(parentRes.answer).map(
       (e) => {
@@ -95,11 +97,14 @@ export class ModelService {
     return data
   }
 
-  private async updateSpreadsheets(answer: string): Promise<void> {
+  private async updateSpreadsheets(
+    spreadsheetId: string,
+    answer: string,
+  ): Promise<void> {
     logger.info(`answer: ${answer}`)
     await Promise.all(
       ChatGptApiUtils.extractCode(answer).map(async (blockCode) => {
-        await SheetsApiUtils.updateSpreadsheets(blockCode)
+        await SheetsApiUtils.updateSpreadsheets(spreadsheetId, blockCode)
       }),
     )
   }

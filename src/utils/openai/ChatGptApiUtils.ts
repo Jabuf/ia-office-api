@@ -13,6 +13,7 @@ export default abstract class ChatGptApiUtils {
     apiKey: process.env.OPENAI_API_KEY ?? '',
     completionParams: {
       model: process.env.OPENAI_DEFAULT_MODEL ?? '',
+      // model: 'gpt-4',
     },
     systemMessage:
       'Your answers must be under 4000 characters, try to be as concise as possible.',
@@ -53,7 +54,15 @@ export default abstract class ChatGptApiUtils {
   }
 
   static extractList(chatGptAnswer: string): string[] {
-    return (JSON.parse(chatGptAnswer) as unknown as { answers: string[] })
-      .answers
+    if (chatGptAnswer.includes('```json')) {
+      return (
+        JSON.parse(this.extractCode(chatGptAnswer, 'json')[0]) as unknown as {
+          answers: string[]
+        }
+      ).answers
+    } else {
+      return (JSON.parse(chatGptAnswer) as unknown as { answers: string[] })
+        .answers
+    }
   }
 }
