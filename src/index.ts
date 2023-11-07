@@ -6,7 +6,6 @@ import middleware from '@fastify/middie'
 import xXssProtection from 'x-xss-protection'
 import { logger } from './utils/logging/logger'
 import dotenv from 'dotenv'
-import { PrismaClientUtils } from './utils/db/PrismaClientUtils'
 import { PrismaClient } from '@prisma/client'
 import sheetsRouter from './routes/sheets'
 import { ApiPrefixes } from './routes/urlConstants'
@@ -64,9 +63,9 @@ export async function startServer() {
       }
     }
 
-    logger.info('Starting the prisma client')
-    prismaClient = await PrismaClientUtils.initPrismaClient()
-    logger.info('The prisma client has been successfully started!')
+    // logger.info('Starting the prisma client')
+    // prismaClient = await PrismaClientUtils.initPrismaClient()
+    // logger.info('The prisma client has been successfully started!')
 
     // Starting the server
     await server.listen({ port: Number(port), host })

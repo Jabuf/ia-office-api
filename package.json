@@ -4,7 +4,7 @@
   "description": "The API of IA office",
   "main": "src/index.js",
   "scripts": {
-    "start": "tsx dist/src/index.js",
+    "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts | pino-pretty",
     "migrate": "npx prisma migrate deploy",
     "migrate:dev": "npx prisma migrate dev && npx prisma generate",
@@ -38,7 +38,6 @@
     "prettier": "^3.0.0",
     "prisma": "4.8.1",
     "ts-node": "^10.9.1",
-    "tsx": "^3.12.10",
     "typescript": "^4.9.5",
     "vitest": "^0.33.0"
   },
@@ -58,6 +57,7 @@
     "pino": "^8.11.0",
     "radash": "^10.7.0",
     "regenerator-runtime": "^0.13.11",
+    "tsx": "^3.12.10",
     "uri-js": "^4.4.1",
     "x-xss-protection": "^2.0.0"
   }
