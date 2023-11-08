@@ -3,6 +3,7 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 import { SheetsService } from '../services/SheetsService'
 
 export type DriveFileUrls = {
+  spreadSheetsId: string
   webContentLink: string | undefined | null
   webViewLink: string | undefined | null
 }

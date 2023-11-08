@@ -4,8 +4,10 @@ import { ModelService } from '../services/ModelService'
 import { DriveFileUrls } from './SheetsController'
 
 export type Conv = {
-  prompt: string
+  initialPrompt: string
   additionalInfo: AdditionalInfo[]
+  spreadSheetsId: string
+  parentResId: string
 }
 
 export type AdditionalInfo = {
@@ -21,6 +23,33 @@ export class ModelController {
     const modelService = new ModelService()
     const fileUrls = await modelService.createSpreadsheet(req.body)
     await HttpControllerUtils.sendPostResponse<DriveFileUrls>(res, fileUrls)
+  }
+
+  updateData = async (
+    req: FastifyRequest<{ Body: Conv }>,
+    res: FastifyReply,
+  ): Promise<void> => {
+    const modelService = new ModelService()
+    const fileUrls = await modelService.updateData(req.body)
+    await HttpControllerUtils.sendPutResponse<DriveFileUrls>(res, fileUrls)
+  }
+
+  updateGraphics = async (
+    req: FastifyRequest<{ Body: Conv }>,
+    res: FastifyReply,
+  ): Promise<void> => {
+    const modelService = new ModelService()
+    const fileUrls = await modelService.updateGraphics(req.body)
+    await HttpControllerUtils.sendPutResponse<DriveFileUrls>(res, fileUrls)
+  }
+
+  updateStyles = async (
+    req: FastifyRequest<{ Body: Conv }>,
+    res: FastifyReply,
+  ): Promise<void> => {
+    const modelService = new ModelService()
+    const fileUrls = await modelService.updateStyles(req.body)
+    await HttpControllerUtils.sendPutResponse<DriveFileUrls>(res, fileUrls)
   }
 
   collectInformation = async (

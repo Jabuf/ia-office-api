@@ -16,13 +16,11 @@ export class ModelService {
     const initialPrompt = `I will give you a prompt that have for goal the creation of a spreadsheet.
         I want you to give me an exhaustive list of information I could put in that spreadsheet, like tables, sheets or graphs.
         I want the label in your answers to use the same language used in the prompt while you'll continue to converse with me in English.
-        The prompt is "${
-          data.prompt
-        }" and the list of additional information is "${data.additionalInfo.toString()}". Among additional information, ignore question that have no answers.`
-    const parentRes = await ChatGptApiUtils.startConv(initialPrompt)
+        The prompt is "${data.initialPrompt}"`
+    data.parentResId = (await ChatGptApiUtils.startConv(initialPrompt)).id
 
-    const id = await SheetsApiUtils.createSpreadSheets(
-      parentRes.id.substring(8),
+    data.spreadSheetsId = await SheetsApiUtils.createSpreadSheets(
+      data.parentResId.substring(8),
     )
     // Step 1
     const codePrompt = `Now I want to put all the information you just provided to me in a spreadsheet, including graphs, sheets and examples for values.
@@ -50,31 +48,34 @@ export class ModelService {
 
         For the first step I want you to only create the sheets.
       `
-    let res = await ChatGptApiUtils.pursueExistingConv(parentRes.id, codePrompt)
-    await this.updateSpreadsheets(id, res.answer)
-    // Step 2
-    res = await ChatGptApiUtils.pursueExistingConv(
-      res.id,
-      // `For the second step I want you to populate the sheets with tables. You don't need to add data to the tables yet, however I'd like if they can be stylized with colors, borders, fonts, etc.`,
-      `For the second step I want you to create the tables in each sheet and populate them with examples.`,
+    data.parentResId = await this.updateSpreadsheets(
+      data.spreadSheetsId,
+      data.parentResId,
+      codePrompt,
     )
-    await this.updateSpreadsheets(id, res.answer)
 
-    // // Step 3
-    // res = await ChatGptApiUtils.pursueExistingConv(
-    //   res.id,
-    //   `For the third step I want you to populate these tables with dummy values.`,
-    // )
-    // await this.updateSpreadsheets(id, res.answer)
+    const prompt = `For the second step I want you to create the tables in each sheet and populate them with examples.`
+    await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
 
-    // // Step 4
-    // res = await ChatGptApiUtils.pursueExistingConv(
-    //   res.id,
-    //   `For the fourth step I want you to add graphs when it's relevant.`,
-    // )
-    // await this.updateSpreadsheets(id, res.answer)
+    return this.sheetsService.getById(data.spreadSheetsId)
+  }
 
-    return this.sheetsService.getById(id)
+  async updateData(data: Conv): Promise<DriveFileUrls> {
+    // const prompt = `For this step I want you to populate these tables with dummy values.`
+    // await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
+    return this.sheetsService.getById(data.spreadSheetsId)
+  }
+
+  async updateGraphics(data: Conv): Promise<DriveFileUrls> {
+    // const prompt = `For this step I want you to add graphs when it's relevant.`
+    // await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
+    return this.sheetsService.getById(data.spreadSheetsId)
+  }
+
+  async updateStyles(data: Conv): Promise<DriveFileUrls> {
+    // const prompt = `For this step I want you to add style to the tables with colors, borders, fonts, etc.`
+    // await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
+    return this.sheetsService.getById(data.spreadSheetsId)
   }
 
   async collectInformation(data: Conv): Promise<Conv> {
@@ -84,7 +85,7 @@ export class ModelService {
           The answer to a question should be simple and short, otherwise don't ask for it.
           I want the answers in the list to use the same language as the one used in the purpose while you'll continue to converse with me in English.
           Your answer must contain a block of code in json which start with \`\`\`json, it will contain the list. The type inside that block must be "{answers : string[]}".
-          The purpose of my spreadsheet is : "${data.prompt}"`
+          The purpose of my spreadsheet is : "${data.initialPrompt}"`
     const parentRes = await ChatGptApiUtils.startConv(initialPrompt)
     logger.info(`conv: ${JSON.stringify(parentRes)}`)
 
@@ -98,14 +99,19 @@ export class ModelService {
   }
 
   private async updateSpreadsheets(
-    spreadsheetId: string,
-    answer: string,
-  ): Promise<void> {
-    logger.info(`answer: ${answer}`)
+    spreadSheetId: string,
+    parentResId: string,
+    prompt: string,
+  ): Promise<string> {
+    const res = await ChatGptApiUtils.pursueExistingConv(parentResId, prompt)
+    logger.info(
+      `spreadSheetId: ${spreadSheetId}, parentResId: ${parentResId}, answer: ${res.answer}`,
+    )
     await Promise.all(
-      ChatGptApiUtils.extractCode(answer).map(async (blockCode) => {
-        await SheetsApiUtils.updateSpreadsheets(spreadsheetId, blockCode)
+      ChatGptApiUtils.extractCode(res.answer).map(async (blockCode) => {
+        await SheetsApiUtils.updateSpreadsheets(spreadSheetId, blockCode)
       }),
     )
+    return res.id
   }
 }
