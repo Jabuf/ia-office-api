@@ -31,7 +31,10 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
     return spreadSheets.data.spreadsheetId || ''
   }
 
-  static async updateSpreadsheets(spreadsheetId: string, code: string) {
+  static async updateSpreadsheets(
+    spreadsheetId: string,
+    code: string,
+  ): Promise<void> {
     const codeToRun = `const { sheets } = this;
     const spreadsheetId = '${spreadsheetId}';
       async function updateSpreadsheets() { ${code} }
@@ -45,5 +48,44 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
 
     const script = new vm.Script(codeToRun)
     await script.runInNewContext(context)
+  }
+
+  static async getSheetIdByName(
+    spreadsheetId: string,
+    sheetName: string,
+  ): Promise<number | null> {
+    const sheets = (
+      await this.sheets.spreadsheets.get({
+        spreadsheetId,
+      })
+    ).data.sheets
+
+    let sheetId = null
+    if (sheets) {
+      const sheet = sheets.find(
+        (sheet) => sheet.properties?.title === sheetName,
+      )
+      if (sheet) {
+        sheetId = sheet.properties?.sheetId ?? null
+      }
+    }
+
+    return sheetId
+  }
+
+  static async removeInitialSheet(spreadsheetId: string): Promise<void> {
+    const request = {
+      spreadsheetId,
+      resource: {
+        requests: [
+          {
+            deleteSheet: {
+              sheetId: 0,
+            },
+          },
+        ],
+      },
+    }
+    await this.sheets.spreadsheets.batchUpdate(request)
   }
 }

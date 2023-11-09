@@ -55,6 +55,8 @@ export class ModelService {
     const prompt = `For the second step I want you to create the tables in each sheet and populate them with examples.`
     await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
 
+    await SheetsApiUtils.removeInitialSheet(data.spreadSheetsId)
+
     return this.sheetsService.getById(data.spreadSheetsId)
   }
 
@@ -103,7 +105,7 @@ export class ModelService {
   ): Promise<string> {
     const res = await ChatGptApiUtils.pursueExistingConv(parentResId, prompt)
     logger.info(
-      `spreadSheetId: ${spreadSheetId}, parentResId: ${parentResId}, answer: ${res.answer}`,
+      `answer size : ${res.answer.length}, spreadSheetId: ${spreadSheetId}, parentResId: ${parentResId}, answer: ${res.answer}`,
     )
     await Promise.all(
       ChatGptApiUtils.extractCode(res.answer).map(async (blockCode) => {
