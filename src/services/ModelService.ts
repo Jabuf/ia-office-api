@@ -22,29 +22,27 @@ export class ModelService {
     data.spreadSheetsId = await SheetsApiUtils.createSpreadSheets(
       data.parentResId.substring(8),
     )
-    // Step 1
-    const codePrompt = `Now I want to put all the information you just provided to me in a spreadsheet, including graphs, sheets and examples for values.
-        We'll be using the Sheets API in nodejs and want you to provide me with blocks of code.
 
-        We'll be proceeding in multiple steps. Here are some instructions about how these steps will work : 
-          each step must contain one block of code which start with \`\`\`javascript;
-          the code of each step must be able to run independently while also using previous information, 
-            for example if you want to reuse the length of a previous variable, store it in your memory and write it directly in a later step, instead of dynamically;
-          each step must respect instructions for code that'll be listed below.
+    const codePrompt = `Now I want you to act as a nodejs developer. 
+    The goal is to create a Google Sheets file that will contain all the information you provided to me previously.
+    We'll be using the Sheets API and you will provide me with multiple answers.
+    I have an application that will extract and execute the code inside your answers automatically. For that I'll be using the runInNewContext function of the vm package.
+    It's imperative that they run without errors, to do so here are instructions :  
+      - each answer must contain exactly one block of code starting with \`\`\`javascript.
+      - each block of code must be able to run independently while also using information contained in previous answers if possible,
+        for example if you want to reuse the length of a variable used in a previous answer, register it and write it directly in a later step instead of referencing it.
+      - additionally each step must respect instructions for code that'll be listed below.
 
-        I'll now give you instructions that you must respect for each steps.
-        I'll give you some instructions for your code :
-          the variable for the id of the spreadsheet is already created and called 'spreadsheetId', use it directly and consequently never create another variable named spreadsheetId;
-          I've already a sheets object that is responsible for the connection to the API client, use it directly and consequently never create another variable named sheets;
-          don't use variables that need to be declared before executing the block, unless I've told you to use them, like spreadsheetId or sheets;
-          ensure that you have created the functions you use;
-          you shouldn't import packages, the sheets object is enough as an entry point;
-          don't forget to use the await keyword;
-          be careful to escape special characters, especially the ' symbol;
-          don't forget to add data for the graphs;
-          keep the code as short as possible (don't add comments or console.log);
-          try to get every id dynamically, for example get the id of a sheet from its name;
-          since you're not necessarily up to date, I want you to use the official documentation (https://developers.google.com/sheets/api/) as much as possible.
+    I'll give you some instructions for your code :
+      - the variable for the id of the spreadsheet is already created and called 'spreadsheetId', use it directly and consequently never create another variable named spreadsheetId
+      - I've already a sheets object that is responsible for the connection to the API client, use it directly and consequently never create another variable named sheets
+      - don't use variables that need to be declared before executing the block, unless I've told you to use them, like spreadsheetId or sheets
+      - ensure that you have created the functions you use
+      - you shouldn't import packages, the sheets object is enough as an entry point
+      - don't forget to use the await keyword
+      - be careful to escape special characters, especially the ' symbol
+      - keep the code as short as possible (don't add comments or console.log)
+      - since you're not necessarily up to date, I want you to use the official documentation (https://developers.google.com/sheets/api/) as much as possible
 
         For the first step I want you to only create the sheets.
       `

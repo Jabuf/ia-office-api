@@ -11,12 +11,13 @@ export type GPTResponse = {
 export default abstract class ChatGptApiUtils {
   private static chatGptApi = new ChatGPTAPI({
     apiKey: process.env.OPENAI_API_KEY ?? '',
+    debug: process.env.OPENAPI_DEBUG === 'true' ?? false,
     completionParams: {
       model: process.env.OPENAI_DEFAULT_MODEL ?? '',
       // model: 'gpt-4',
     },
-    systemMessage:
-      'Your answers must be under 4000 characters, try to be as concise as possible.',
+    systemMessage: `You are ChatGPT, a large language model trained by OpenAI, your answers must be under 4000 characters and as concise as possible.' +
+        'Your information are up to date until September 2021, today we are the ${new Date().toDateString()}`,
   })
 
   static async startConv(message: string): Promise<GPTResponse> {
