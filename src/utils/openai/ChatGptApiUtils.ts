@@ -18,7 +18,7 @@ export default abstract class ChatGptApiUtils {
       model: process.env.OPENAI_DEFAULT_MODEL ?? '',
       // model: 'gpt-4',
     },
-    systemMessage: `You are ChatGPT, a large language model trained by OpenAI, your answers must be under 4000 characters and as concise as possible.' +
+    systemMessage: `You are ChatGPT, a large language model trained by OpenAI, your answers must be under 3500 characters and as concise as possible.' +
         'Your information are up to date until September 2021, today we are the ${new Date().toDateString()}`,
   })
 
