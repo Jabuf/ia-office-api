@@ -23,11 +23,11 @@ export class ModelService {
       data.parentResId.substring(8),
     )
 
-    const codePrompt = `Now I want you to act as a nodejs developer. 
+    const codePrompt = `Now I want you to act as a nodejs developer.
     The goal is to create a Google Sheets file that will contain all the information you provided to me previously.
     We'll be using the Sheets API and you will provide me with multiple answers.
     I have an application that will extract and execute the code inside your answers automatically. For that I'll be using the runInNewContext function of the vm package.
-    It's imperative that they run without errors, to do so here are instructions :  
+    It's imperative that they run without errors, to do so here are instructions :
       - each answer must contain exactly one block of code starting with \`\`\`javascript.
       - each block of code must be able to run independently while also using information contained in previous answers if possible,
         for example if you want to reuse the length of a variable used in a previous answer, register it and write it directly in a later step instead of referencing it.
@@ -78,6 +78,9 @@ export class ModelService {
     return this.sheetsService.getById(data.spreadSheetsId)
   }
 
+  /**
+   * @deprecated
+   */
   async collectInformation(data: Conv): Promise<Conv> {
     const initialPrompt = `My goal is to create of a spreadsheet.
           I'll later ask you to give me exhaustive information that I could put in that spreadsheet, like tables, sheets or graphs.
