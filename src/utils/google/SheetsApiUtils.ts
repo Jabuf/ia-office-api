@@ -3,6 +3,7 @@ import { google } from 'googleapis'
 import GoogleApiUtils from './GoogleApiUtils'
 import DriveApiUtils from './DriveApiUtils'
 import { logger } from '../logging/logger'
+import { CustomError } from '../errors/CustomError'
 
 export default abstract class SheetsApiUtils extends GoogleApiUtils {
   static sheets = google.sheets({
@@ -47,7 +48,13 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
     logger.info(`codeRun : ${codeToRun}`)
 
     const script = new vm.Script(codeToRun)
-    await script.runInNewContext(context)
+    try {
+      await script.runInNewContext(context)
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new CustomError('ERROR_RUN_CODE', e.message, e.name)
+      }
+    }
   }
 
   static async getSheetIdByName(
@@ -74,18 +81,25 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
   }
 
   static async removeInitialSheet(spreadsheetId: string): Promise<void> {
-    const request = {
-      spreadsheetId,
-      resource: {
-        requests: [
-          {
-            deleteSheet: {
-              sheetId: 0,
+    const spreadSheet = await this.sheets.spreadsheets.get({ spreadsheetId })
+    if (
+      spreadSheet &&
+      spreadSheet.data.sheets?.length &&
+      spreadSheet.data.sheets.length > 1
+    ) {
+      const request = {
+        spreadsheetId,
+        resource: {
+          requests: [
+            {
+              deleteSheet: {
+                sheetId: 0,
+              },
             },
-          },
-        ],
-      },
+          ],
+        },
+      }
+      await this.sheets.spreadsheets.batchUpdate(request)
     }
-    await this.sheets.spreadsheets.batchUpdate(request)
   }
 }

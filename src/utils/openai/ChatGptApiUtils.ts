@@ -1,5 +1,7 @@
 import dotenv from 'dotenv'
 import { ChatGPTAPI } from 'chatgpt'
+import { logger } from '../logging/logger'
+import { errorOpenAi } from '../errors/CustomError'
 
 dotenv.config()
 
@@ -32,12 +34,17 @@ export default abstract class ChatGptApiUtils {
     parentMessageId: string,
     message: string,
   ): Promise<GPTResponse> {
-    const res = await this.chatGptApi.sendMessage(message, {
-      parentMessageId,
-    })
-    return {
-      answer: res.text,
-      id: res.id,
+    try {
+      const res = await this.chatGptApi.sendMessage(message, {
+        parentMessageId,
+      })
+      return {
+        answer: res.text,
+        id: res.id,
+      }
+    } catch (e) {
+      logger.error(e)
+      throw errorOpenAi
     }
   }
 
@@ -54,6 +61,9 @@ export default abstract class ChatGptApiUtils {
     return codeBlocks
   }
 
+  /**
+   * @deprecated
+   */
   static extractList(chatGptAnswer: string): string[] {
     if (chatGptAnswer.includes('```json')) {
       return (
