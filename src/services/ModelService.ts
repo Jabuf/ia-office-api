@@ -52,7 +52,7 @@ export class ModelService {
       codePrompt,
     )
 
-    const prompt = `For the second step I want you to create the tables without data in each sheet.`
+    const prompt = `For the second step I want you to create the tables without data in each sheet while following the same instructions as the previous request.`
     await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
 
     await SheetsApiUtils.removeInitialSheet(data.spreadSheetsId)
@@ -64,7 +64,7 @@ export class ModelService {
   }
 
   async updateExamples(data: Conv): Promise<SpreadSheetInfo> {
-    const prompt = `For this step I want you to populate these tables with examples.`
+    const prompt = `For this step I want you to populate these tables with examples while following the same instructions as the previous request..`
     await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
     return {
       parentResId: data.parentResId,
@@ -73,7 +73,7 @@ export class ModelService {
   }
 
   async updateFormulas(data: Conv): Promise<SpreadSheetInfo> {
-    const prompt = `For this step I want you to add formulas inside cells to help the user of this table as much as possible.`
+    const prompt = `For this step I want you to add formulas inside cells to help the user of this table as much as possible while following the same instructions as the previous request.`
     await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
     return {
       parentResId: data.parentResId,
@@ -82,7 +82,7 @@ export class ModelService {
   }
 
   async updateGraphics(data: Conv): Promise<SpreadSheetInfo> {
-    const prompt = `For this step I want you to add graphs when it's relevant.`
+    const prompt = `For this step I want you to add graphs when it's relevant while following the same instructions as the previous request.`
     await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
     return {
       parentResId: data.parentResId,
@@ -129,8 +129,19 @@ export class ModelService {
   ): Promise<string> {
     const res = await ChatGptApiUtils.pursueExistingConv(parentResId, prompt)
     logger.info(
-      `prompt: ${prompt}, answer size : ${res.answer.length}, spreadSheetId: ${spreadSheetId}, parentResId: ${parentResId}, answer: ${res.answer}`,
+      `prompt: ${prompt}, answer size : ${JSON.stringify(
+        res.usage,
+      )}, spreadSheetId: ${spreadSheetId}, parentResId: ${parentResId}, answer: ${
+        res.answer
+      }`,
     )
+    if (res.usage?.total_tokens && res.usage?.total_tokens > 4000) {
+      logger.warn(
+        `The number of tokens is close to exceeding the limit : ${JSON.stringify(
+          res.usage,
+        )}`,
+      )
+    }
     await Promise.all(
       ChatGptApiUtils.extractCode(res.answer).map(async (blockCode) => {
         await SheetsApiUtils.updateSpreadsheets(spreadSheetId, blockCode)
