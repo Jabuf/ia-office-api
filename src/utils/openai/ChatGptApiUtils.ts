@@ -11,11 +11,13 @@ export type GPTResponse = {
 }
 
 export default abstract class ChatGptApiUtils {
-  private static chatGptApi = new ChatGPTAPI({
+  static chatGptApi = new ChatGPTAPI({
     apiKey: process.env.OPENAI_API_KEY ?? '',
     debug: process.env.OPENAPI_DEBUG === 'true' ?? false,
     completionParams: {
-      model: process.env.OPENAI_DEFAULT_MODEL ?? '',
+      // Available models here : https://platform.openai.com/docs/models/
+      // model: process.env.OPENAI_DEFAULT_MODEL ?? '',
+      model: 'gpt-3.5-turbo',
       // model: 'gpt-4',
     },
     systemMessage: `You are ChatGPT, a large language model trained by OpenAI, your answers must be under 3500 characters and as concise as possible.' +
@@ -23,10 +25,15 @@ export default abstract class ChatGptApiUtils {
   })
 
   static async startConv(message: string): Promise<GPTResponse> {
-    const res = await this.chatGptApi.sendMessage(message)
-    return {
-      answer: res.text,
-      id: res.id,
+    try {
+      const res = await this.chatGptApi.sendMessage(message)
+      return {
+        answer: res.text,
+        id: res.id,
+      }
+    } catch (e) {
+      logger.error(e)
+      throw errorOpenAi
     }
   }
 
