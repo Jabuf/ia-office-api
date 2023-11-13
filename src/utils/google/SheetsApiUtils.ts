@@ -4,6 +4,7 @@ import GoogleApiUtils from './GoogleApiUtils'
 import DriveApiUtils from './DriveApiUtils'
 import { logger } from '../logging/logger'
 import { CustomError } from '../errors/CustomError'
+import { GaxiosError } from 'gaxios'
 
 export default abstract class SheetsApiUtils extends GoogleApiUtils {
   static sheets = google.sheets({
@@ -50,9 +51,12 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
     try {
       const script = new vm.Script(codeToRun)
       await script.runInNewContext(context)
-    } catch (e) {
-      if (e instanceof Error) {
-        throw new CustomError('ERROR_RUN_CODE', e.message, e.name)
+    } catch (err) {
+      if (err instanceof GaxiosError) {
+        throw new CustomError('ERROR_GOOGLE_API', err.message, err.name)
+      }
+      if (err instanceof Error) {
+        throw new CustomError('ERROR_RUN_CODE', err.message, err.name)
       }
     }
   }
