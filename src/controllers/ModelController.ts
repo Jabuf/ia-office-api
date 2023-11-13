@@ -25,12 +25,21 @@ export class ModelController {
     await HttpControllerUtils.sendPostResponse<DriveFileUrls>(res, fileUrls)
   }
 
-  updateData = async (
+  updateExamples = async (
     req: FastifyRequest<{ Body: Conv }>,
     res: FastifyReply,
   ): Promise<void> => {
     const modelService = new ModelService()
-    const fileUrls = await modelService.updateData(req.body)
+    const fileUrls = await modelService.updateExamples(req.body)
+    await HttpControllerUtils.sendPutResponse<DriveFileUrls>(res, fileUrls)
+  }
+
+  updateFormulas = async (
+    req: FastifyRequest<{ Body: Conv }>,
+    res: FastifyReply,
+  ): Promise<void> => {
+    const modelService = new ModelService()
+    const fileUrls = await modelService.updateFormulas(req.body)
     await HttpControllerUtils.sendPutResponse<DriveFileUrls>(res, fileUrls)
   }
 

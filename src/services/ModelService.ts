@@ -52,7 +52,7 @@ export class ModelService {
       codePrompt,
     )
 
-    const prompt = `For the second step I want you to create the tables in each sheet and populate them with examples.`
+    const prompt = `For the second step I want you to create the tables without data in each sheet.`
     await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
 
     await SheetsApiUtils.removeInitialSheet(data.spreadSheetsId)
@@ -60,8 +60,14 @@ export class ModelService {
     return this.sheetsService.getById(data.spreadSheetsId)
   }
 
-  async updateData(data: Conv): Promise<DriveFileUrls> {
-    // const prompt = `For this step I want you to populate these tables with dummy values.`
+  async updateExamples(data: Conv): Promise<DriveFileUrls> {
+    const prompt = `For this step I want you to populate these tables with examples.`
+    await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
+    return this.sheetsService.getById(data.spreadSheetsId)
+  }
+
+  async updateFormulas(data: Conv): Promise<DriveFileUrls> {
+    // const prompt = `For this step I want you to add style to the tables with colors, borders, fonts, etc.`
     // await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
     return this.sheetsService.getById(data.spreadSheetsId)
   }
@@ -108,7 +114,7 @@ export class ModelService {
   ): Promise<string> {
     const res = await ChatGptApiUtils.pursueExistingConv(parentResId, prompt)
     logger.info(
-      `answer size : ${res.answer.length}, spreadSheetId: ${spreadSheetId}, parentResId: ${parentResId}, answer: ${res.answer}`,
+      `prompt: ${prompt}, answer size : ${res.answer.length}, spreadSheetId: ${spreadSheetId}, parentResId: ${parentResId}, answer: ${res.answer}`,
     )
     await Promise.all(
       ChatGptApiUtils.extractCode(res.answer).map(async (blockCode) => {

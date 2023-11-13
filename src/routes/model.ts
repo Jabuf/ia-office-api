@@ -13,8 +13,13 @@ export default async function modelRouter(fastify: FastifyInstance) {
   })
   fastify.route({
     method: 'PUT',
-    url: `${basePath}/data`,
-    handler: modelController.updateData,
+    url: `${basePath}/examples`,
+    handler: modelController.updateExamples,
+  })
+  fastify.route({
+    method: 'PUT',
+    url: `${basePath}/formulas`,
+    handler: modelController.updateFormulas,
   })
   fastify.route({
     method: 'PUT',
