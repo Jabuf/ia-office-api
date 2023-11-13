@@ -2,12 +2,14 @@ import dotenv from 'dotenv'
 import { ChatGPTAPI } from 'chatgpt'
 import { logger } from '../logging/logger'
 import { errorOpenAi } from '../errors/CustomError'
+import { CreateCompletionResponseUsage } from 'openai'
 
 dotenv.config()
 
 export type GPTResponse = {
   answer: string
   id: string
+  usage: CreateCompletionResponseUsage | undefined
 }
 
 export default abstract class ChatGptApiUtils {
@@ -20,16 +22,17 @@ export default abstract class ChatGptApiUtils {
       model: 'gpt-3.5-turbo',
       // model: 'gpt-4',
     },
-    systemMessage: `You are ChatGPT, a large language model trained by OpenAI, your answers must be under 3500 characters and as concise as possible.' +
-        'Your information are up to date until September 2021, today we are the ${new Date().toDateString()}`,
+    systemMessage: `You are ChatGPT, a large language model trained by OpenAI. 
+    Your answers must be complete and contains a number of tokens that, added with the tokens of the question, must be under 4000. So try to be as concise as possible.`,
   })
 
   static async startConv(message: string): Promise<GPTResponse> {
     try {
       const res = await this.chatGptApi.sendMessage(message)
       return {
-        answer: res.text,
         id: res.id,
+        answer: res.text,
+        usage: res.detail?.usage,
       }
     } catch (e) {
       logger.error(e)
@@ -46,8 +49,9 @@ export default abstract class ChatGptApiUtils {
         parentMessageId,
       })
       return {
-        answer: res.text,
         id: res.id,
+        answer: res.text,
+        usage: res.detail?.usage,
       }
     } catch (e) {
       logger.error(e)
