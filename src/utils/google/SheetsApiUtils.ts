@@ -47,8 +47,8 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
     }
     logger.info(`codeRun : ${codeToRun}`)
 
-    const script = new vm.Script(codeToRun)
     try {
+      const script = new vm.Script(codeToRun)
       await script.runInNewContext(context)
     } catch (e) {
       if (e instanceof Error) {
