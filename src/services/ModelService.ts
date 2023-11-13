@@ -1,5 +1,4 @@
-import { DriveFileUrls } from '../controllers/SheetsController'
-import { Conv } from '../controllers/ModelController'
+import { Conv, SpreadSheetInfo } from '../controllers/ModelController'
 import { SheetsService } from './SheetsService'
 import SheetsApiUtils from '../utils/google/SheetsApiUtils'
 import { logger } from '../utils/logging/logger'
@@ -12,7 +11,7 @@ export class ModelService {
     this.sheetsService = new SheetsService()
   }
 
-  async createSpreadsheet(data: Conv): Promise<DriveFileUrls> {
+  async createSpreadsheet(data: Conv): Promise<SpreadSheetInfo> {
     const initialPrompt = `I will give you a prompt that have for goal the creation of a spreadsheet.
         I want you to give me an exhaustive list of information I could put in that spreadsheet, like tables, sheets or graphs.
         I want the label in your answers to use the same language used in the prompt while you'll continue to converse with me in English.
@@ -58,31 +57,46 @@ export class ModelService {
 
     await SheetsApiUtils.removeInitialSheet(data.spreadSheetsId)
 
-    return this.sheetsService.getById(data.spreadSheetsId)
+    return {
+      parentResId: data.parentResId,
+      driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
+    }
   }
 
-  async updateExamples(data: Conv): Promise<DriveFileUrls> {
+  async updateExamples(data: Conv): Promise<SpreadSheetInfo> {
     const prompt = `For this step I want you to populate these tables with examples.`
     await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
-    return this.sheetsService.getById(data.spreadSheetsId)
+    return {
+      parentResId: data.parentResId,
+      driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
+    }
   }
 
-  async updateFormulas(data: Conv): Promise<DriveFileUrls> {
-    // const prompt = `For this step I want you to add style to the tables with colors, borders, fonts, etc.`
-    // await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
-    return this.sheetsService.getById(data.spreadSheetsId)
+  async updateFormulas(data: Conv): Promise<SpreadSheetInfo> {
+    const prompt = `For this step I want you to add formulas inside cells to help the user of this table as much as possible.`
+    await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
+    return {
+      parentResId: data.parentResId,
+      driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
+    }
   }
 
-  async updateGraphics(data: Conv): Promise<DriveFileUrls> {
-    // const prompt = `For this step I want you to add graphs when it's relevant.`
-    // await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
-    return this.sheetsService.getById(data.spreadSheetsId)
+  async updateGraphics(data: Conv): Promise<SpreadSheetInfo> {
+    const prompt = `For this step I want you to add graphs when it's relevant.`
+    await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
+    return {
+      parentResId: data.parentResId,
+      driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
+    }
   }
 
-  async updateStyles(data: Conv): Promise<DriveFileUrls> {
-    // const prompt = `For this step I want you to add style to the tables with colors, borders, fonts, etc.`
-    // await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
-    return this.sheetsService.getById(data.spreadSheetsId)
+  async updateStyles(data: Conv): Promise<SpreadSheetInfo> {
+    const prompt = `For this step I want you to add style to the tables with colors, borders, fonts, etc.`
+    await this.updateSpreadsheets(data.spreadSheetsId, data.parentResId, prompt)
+    return {
+      parentResId: data.parentResId,
+      driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
+    }
   }
 
   /**

@@ -2,7 +2,7 @@ import { HttpControllerUtils } from '../utils/HttpControllerUtils'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { SheetsService } from '../services/SheetsService'
 
-export type DriveFileUrls = {
+export type DriveFileInfo = {
   spreadSheetsId: string
   webContentLink: string | undefined | null
   webViewLink: string | undefined | null
@@ -15,7 +15,7 @@ export class SheetsController {
   ): Promise<void> => {
     const sheetsService = new SheetsService()
     const sheets = await sheetsService.create(req.body)
-    await HttpControllerUtils.sendPostResponse<DriveFileUrls>(res, sheets)
+    await HttpControllerUtils.sendPostResponse<DriveFileInfo>(res, sheets)
   }
 
   get = async (
@@ -26,6 +26,6 @@ export class SheetsController {
   ): Promise<void> => {
     const sheetsService = new SheetsService()
     const sheets = await sheetsService.getById(req.query.id)
-    await HttpControllerUtils.sendPostResponse<DriveFileUrls>(res, sheets)
+    await HttpControllerUtils.sendPostResponse<DriveFileInfo>(res, sheets)
   }
 }

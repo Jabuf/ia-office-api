@@ -1,13 +1,18 @@
 import { HttpControllerUtils } from '../utils/HttpControllerUtils'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { ModelService } from '../services/ModelService'
-import { DriveFileUrls } from './SheetsController'
+import { DriveFileInfo } from './SheetsController'
 
 export type Conv = {
   initialPrompt: string
   additionalInfo: AdditionalInfo[]
   spreadSheetsId: string
   parentResId: string
+}
+
+export type SpreadSheetInfo = {
+  parentResId: string
+  driveFileInfo: DriveFileInfo
 }
 
 export type AdditionalInfo = {
@@ -21,8 +26,11 @@ export class ModelController {
     res: FastifyReply,
   ): Promise<void> => {
     const modelService = new ModelService()
-    const fileUrls = await modelService.createSpreadsheet(req.body)
-    await HttpControllerUtils.sendPostResponse<DriveFileUrls>(res, fileUrls)
+    const spreadSheetInfo = await modelService.createSpreadsheet(req.body)
+    await HttpControllerUtils.sendPostResponse<SpreadSheetInfo>(
+      res,
+      spreadSheetInfo,
+    )
   }
 
   updateExamples = async (
@@ -30,8 +38,11 @@ export class ModelController {
     res: FastifyReply,
   ): Promise<void> => {
     const modelService = new ModelService()
-    const fileUrls = await modelService.updateExamples(req.body)
-    await HttpControllerUtils.sendPutResponse<DriveFileUrls>(res, fileUrls)
+    const spreadSheetInfo = await modelService.updateExamples(req.body)
+    await HttpControllerUtils.sendPutResponse<SpreadSheetInfo>(
+      res,
+      spreadSheetInfo,
+    )
   }
 
   updateFormulas = async (
@@ -39,8 +50,11 @@ export class ModelController {
     res: FastifyReply,
   ): Promise<void> => {
     const modelService = new ModelService()
-    const fileUrls = await modelService.updateFormulas(req.body)
-    await HttpControllerUtils.sendPutResponse<DriveFileUrls>(res, fileUrls)
+    const spreadSheetInfo = await modelService.updateFormulas(req.body)
+    await HttpControllerUtils.sendPutResponse<SpreadSheetInfo>(
+      res,
+      spreadSheetInfo,
+    )
   }
 
   updateGraphics = async (
@@ -48,8 +62,11 @@ export class ModelController {
     res: FastifyReply,
   ): Promise<void> => {
     const modelService = new ModelService()
-    const fileUrls = await modelService.updateGraphics(req.body)
-    await HttpControllerUtils.sendPutResponse<DriveFileUrls>(res, fileUrls)
+    const spreadSheetInfo = await modelService.updateGraphics(req.body)
+    await HttpControllerUtils.sendPutResponse<SpreadSheetInfo>(
+      res,
+      spreadSheetInfo,
+    )
   }
 
   updateStyles = async (
@@ -57,8 +74,11 @@ export class ModelController {
     res: FastifyReply,
   ): Promise<void> => {
     const modelService = new ModelService()
-    const fileUrls = await modelService.updateStyles(req.body)
-    await HttpControllerUtils.sendPutResponse<DriveFileUrls>(res, fileUrls)
+    const spreadSheetInfo = await modelService.updateStyles(req.body)
+    await HttpControllerUtils.sendPutResponse<SpreadSheetInfo>(
+      res,
+      spreadSheetInfo,
+    )
   }
 
   collectInformation = async (
