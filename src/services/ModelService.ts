@@ -36,10 +36,11 @@ export class ModelService {
     I'll give you some instructions for your code :
       - the variable for the id of the spreadsheet is already created and called 'spreadsheetId', use it directly and consequently never create another variable named spreadsheetId
       - I've already a sheets object that is responsible for the connection to the API client, use it directly and consequently never create another variable named sheets
-      - don't use variables that need to be declared before executing the block, unless I've told you to use them, like spreadsheetId or sheets
+      - never use variables that need to be declared before executing the block, unless I've told you to use them, like spreadsheetId or sheets
+      - never write something in code that's intended to be replaced before executing it
       - ensure that you have created the functions you use
       - you shouldn't import packages, the sheets object is enough as an entry point
-      - don't forget to use the await keyword
+      - don't forget to use the await keyword, and when you use it ensure that the function is async
       - be careful to escape special characters, especially the ' symbol
       - keep the code as short as possible (don't add comments or console.log)
       - since you're not necessarily up to date, I want you to use the official documentation (https://developers.google.com/sheets/api/) as much as possible
