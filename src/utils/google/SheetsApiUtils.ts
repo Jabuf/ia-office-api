@@ -1,10 +1,20 @@
 import vm from 'vm'
-import { google } from 'googleapis'
+import { google, sheets_v4 } from 'googleapis'
 import GoogleApiUtils from './GoogleApiUtils'
 import DriveApiUtils from './DriveApiUtils'
-import { logger } from '../logging/logger'
 import { CustomError } from '../errors/CustomError'
 import { GaxiosError } from 'gaxios'
+import { logger } from '../logging/logger'
+
+export type SpreadsheetData = {
+  title: string
+  sheetsData: SheetData[]
+}
+
+type SheetData = {
+  name: string
+  values: string[][]
+}
 
 export default abstract class SheetsApiUtils extends GoogleApiUtils {
   static sheets = google.sheets({
@@ -31,6 +41,74 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
       },
     })
     return spreadSheets.data.spreadsheetId || ''
+  }
+
+  static async createSheets(
+    spreadsheetId: string,
+    sheetNames: string[],
+  ): Promise<void> {
+    const { data } = await this.sheets.spreadsheets.get({
+      spreadsheetId,
+    })
+    const existingSheetTitles =
+      data.sheets?.map((sheet) => sheet.properties?.title) || []
+    const sheetsToCreate = sheetNames.filter(
+      (sheetName) => !existingSheetTitles.includes(sheetName),
+    )
+
+    if (sheetsToCreate.length > 0) {
+      const requests: sheets_v4.Schema$Request[] = sheetsToCreate.map(
+        (sheetName) => ({
+          addSheet: {
+            properties: {
+              title: sheetName,
+            },
+          },
+        }),
+      )
+      await this.sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+          requests,
+        },
+      })
+    }
+  }
+
+  static async updateSheet(
+    spreadsheetId: string,
+    sheetsData: SheetData[],
+  ): Promise<void> {
+    await Promise.all(
+      sheetsData.map(async (sheetData) => {
+        const sheetId = await this.getSheetIdByName(
+          spreadsheetId,
+          sheetData.name,
+        )
+        try {
+          if (sheetId) {
+            const range = `${sheetData.name}!A1:${String.fromCharCode(
+              'A'.charCodeAt(0) + sheetData.values[0].length,
+            )}${sheetData.values.length}`
+            await this.sheets.spreadsheets.values.update({
+              spreadsheetId,
+              range,
+              valueInputOption: 'USER_ENTERED',
+              requestBody: {
+                values: sheetData.values,
+              },
+            })
+          }
+        } catch (err) {
+          if (err instanceof GaxiosError) {
+            throw new CustomError('ERROR_GOOGLE_API', err.message, err.name)
+          }
+          if (err instanceof Error) {
+            throw new CustomError('UNKNOWN_ERROR', err.message, err.name)
+          }
+        }
+      }),
+    )
   }
 
   static async updateSpreadsheets(

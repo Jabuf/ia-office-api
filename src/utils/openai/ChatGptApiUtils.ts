@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 import { ChatGPTAPI } from 'chatgpt'
 import { logger } from '../logging/logger'
-import { errorOpenAi } from '../errors/CustomError'
+import { CustomError, errorOpenAi } from '../errors/CustomError'
 import { CreateCompletionResponseUsage } from 'openai'
 import PromptUtils from './PromptUtils'
 
@@ -19,8 +19,8 @@ export default abstract class ChatGptApiUtils {
     debug: process.env.OPENAPI_DEBUG === 'true' ?? false,
     completionParams: {
       // Available models here : https://platform.openai.com/docs/models/
-      model: process.env.OPENAI_DEFAULT_MODEL ?? '',
-      // model: 'gpt-3.5-turbo-1106',
+      // model: process.env.OPENAI_DEFAULT_MODEL ?? '',
+      model: 'gpt-3.5-turbo-1106',
       // model: 'gpt-4',
     },
     systemMessage: `You are ChatGPT, a large language model trained by OpenAI. 
@@ -47,9 +47,12 @@ export default abstract class ChatGptApiUtils {
     message: string,
   ): Promise<GPTResponse> {
     try {
+      const start = performance.now()
       const res = await this.chatGptApi.sendMessage(message, {
         parentMessageId,
       })
+      const end = performance.now()
+      logger.info(`gpt execution time: ${((end - start) / 1000).toFixed(0)}`)
       return {
         id: res.id,
         answer: res.text,
@@ -84,19 +87,18 @@ export default abstract class ChatGptApiUtils {
     }
   }
 
-  /**
-   * @deprecated
-   */
-  static extractList(chatGptAnswer: string): string[] {
-    if (chatGptAnswer.includes('```json')) {
-      return (
-        JSON.parse(this.extractCode(chatGptAnswer, 'json')[0]) as unknown as {
-          answers: string[]
-        }
-      ).answers
-    } else {
-      return (JSON.parse(chatGptAnswer) as unknown as { answers: string[] })
-        .answers
+  static extractJson<T>(chatGptAnswer: string): T | undefined {
+    try {
+      if (chatGptAnswer.includes('```json')) {
+        return JSON.parse(this.extractCode(chatGptAnswer, 'json')[0]) as T
+      }
+    } catch (err) {
+      if (err instanceof SyntaxError) {
+        throw new CustomError('ERROR_JSON', err.message, err.name)
+      }
+      if (err instanceof Error) {
+        throw new CustomError('ERROR_RUN_CODE', err.message, err.name)
+      }
     }
   }
 }
