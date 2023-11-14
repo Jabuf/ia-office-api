@@ -3,6 +3,7 @@ import { ChatGPTAPI } from 'chatgpt'
 import { logger } from '../logging/logger'
 import { errorOpenAi } from '../errors/CustomError'
 import { CreateCompletionResponseUsage } from 'openai'
+import PromptUtils from './PromptUtils'
 
 dotenv.config()
 
@@ -18,13 +19,14 @@ export default abstract class ChatGptApiUtils {
     debug: process.env.OPENAPI_DEBUG === 'true' ?? false,
     completionParams: {
       // Available models here : https://platform.openai.com/docs/models/
-      // model: process.env.OPENAI_DEFAULT_MODEL ?? '',
-      model: 'gpt-3.5-turbo',
+      model: process.env.OPENAI_DEFAULT_MODEL ?? '',
+      // model: 'gpt-3.5-turbo-1106',
       // model: 'gpt-4',
     },
     systemMessage: `You are ChatGPT, a large language model trained by OpenAI. 
-    Your answers must be complete and contains a number of tokens that, added with the tokens of the question, must be under 4000. So try to be as concise as possible.`,
+    Your answers must be complete and contains a number of tokens that, added with the tokens of the question, must be under 4000. Try to be as concise as possible.`,
   })
+  static sheetsParentResId = ''
 
   static async startConv(message: string): Promise<GPTResponse> {
     try {
@@ -34,8 +36,8 @@ export default abstract class ChatGptApiUtils {
         answer: res.text,
         usage: res.detail?.usage,
       }
-    } catch (e) {
-      logger.error(e)
+    } catch (err) {
+      logger.error(err)
       throw errorOpenAi
     }
   }
@@ -53,8 +55,8 @@ export default abstract class ChatGptApiUtils {
         answer: res.text,
         usage: res.detail?.usage,
       }
-    } catch (e) {
-      logger.error(e)
+    } catch (err) {
+      logger.error(err)
       throw errorOpenAi
     }
   }
@@ -70,6 +72,16 @@ export default abstract class ChatGptApiUtils {
       }
     })
     return codeBlocks
+  }
+
+  static async startSheetsApiConv(): Promise<string> {
+    try {
+      const res = await this.chatGptApi.sendMessage(PromptUtils.sheetsApi)
+      return res.id
+    } catch (err) {
+      logger.error(err)
+      throw errorOpenAi
+    }
   }
 
   /**

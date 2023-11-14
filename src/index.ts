@@ -10,6 +10,7 @@ import { PrismaClient } from '@prisma/client'
 import sheetsRouter from './routes/sheets'
 import { ApiPrefixes } from './routes/urlConstants'
 import modelRouter from './routes/model'
+import ChatGptApiUtils from './utils/openai/ChatGptApiUtils'
 
 dotenv.config()
 
@@ -63,9 +64,12 @@ export async function startServer() {
       }
     }
 
-    // logger.info('Starting the prisma client')
-    // prismaClient = await PrismaClientUtils.initPrismaClient()
-    // logger.info('The prisma client has been successfully started!')
+    ChatGptApiUtils.sheetsParentResId =
+      await ChatGptApiUtils.startSheetsApiConv()
+    // ChatGptApiUtils.sheetsParentResId = 'chatcmpl-8Kl10uiKUb4lWNNGw7ITKLSmECqA4'
+    logger.info(
+      `A conversation with ChatGPT has been initialized, id: ${ChatGptApiUtils.sheetsParentResId}`,
+    )
 
     // Starting the server
     await server.listen({ port: Number(port), host })
