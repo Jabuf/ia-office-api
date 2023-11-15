@@ -1,27 +1,62 @@
 import { Conv, SpreadSheetInfo } from '../controllers/ModelController'
 import { SheetsService } from './SheetsService'
-import SheetsApiUtils, { SpreadsheetData } from '../utils/google/SheetsApiUtils'
-import { logger } from '../utils/logging/logger'
+import SheetsApiUtils, {
+  ChartData,
+  SpreadsheetData,
+} from '../utils/google/SheetsApiUtils'
 import ChatGptApiUtils from '../utils/openai/ChatGptApiUtils'
 
-const spreadsheetExample: SpreadsheetData = {
+export const spreadsheetExample: SpreadsheetData = {
   title: 'My spreadsheet title',
   sheetsData: [
     {
       name: 'MySheet1',
       values: [
-        ['Name', 'Job'],
-        ['John', 'CEO'],
-        ['Robert', 'Salesman'],
+        ['Name', 'Sales'],
+        ['John', '123'],
+        ['Robert', '456'],
       ],
     },
     {
       name: 'MySheet2',
       values: [
-        ['Sales', 'Month'],
+        ['Global sales', 'Month'],
         ['123', 'january'],
         ['456', 'march'],
       ],
+    },
+  ],
+}
+
+export const chartExample: ChartData = {
+  title: 'My chart title',
+  chartType: 'BAR',
+  axes: [
+    {
+      title: 'Sales',
+      position: 'BOTTOM_AXIS',
+    },
+    {
+      title: 'Names',
+      position: 'LEFT_AXIS',
+    },
+  ],
+  series: [
+    {
+      series: {
+        sourceRange: {
+          sources: [
+            {
+              sheetName: 'MySheet1',
+              startRowIndex: 0,
+              endRowIndex: 3,
+              startColumnIndex: 1,
+              endColumnIndex: 2,
+            },
+          ],
+        },
+      },
+      targetAxis: 'BASIC_CHART_AXIS_POSITION_UNSPECIFIED',
     },
   ],
 }
@@ -45,13 +80,6 @@ export class ModelService {
     First I want you to return me the a JSON object following the example that I will give you and that will contain the information you mentioned previously:
     ${JSON.stringify(spreadsheetExample)}`
     const res = await ChatGptApiUtils.pursueExistingConv(gptRes.id, prompt)
-    logger.info(
-      `parentId: ${gptRes.id}, 
-      answer size : ${JSON.stringify(res.usage)}, 
-      spreadSheetId: ${data.spreadSheetsId}, 
-      answer: ${res.answer},
-      prompt: ${prompt}`,
-    )
 
     const spreadsheetData = ChatGptApiUtils.extractJson<SpreadsheetData>(
       res.answer,
@@ -91,13 +119,29 @@ export class ModelService {
     }
   }
 
-  async updateGraphics(data: Conv): Promise<SpreadSheetInfo> {
-    // const prompt = `For this step I want you to add graphs when it's relevant while following the same instructions as the previous request.`
-    // data.parentResId = await this.updateSpreadsheets(
-    //   data.spreadSheetsId,
-    //   data.parentResId,
-    //   prompt,
-    // )
+  async updateCharts(data: Conv): Promise<SpreadSheetInfo> {
+    // TODO manage multiple charts
+    // TODO Ask for advice about charts instead of the pure data
+    const prompt = `Now I want to add a chart to my Sheets file. 
+    Your role will be to provide me with JSON objects that I will use in my functions.
+    I want you to return me the a JSON object following the example but that will instead use what we've added in our Sheets file previously :
+    ${JSON.stringify(chartExample)}
+    Moreover here's additional information :
+    - the property chartType can take the following values : 'BAR', 'LINE', 'AREA', 'COLUMN', 'SCATTER' or 'STEPPED_AREA'; you're free to decide what's most adapted
+    - the property position of the axes object can take the following values : 'BOTTOM_AXIS', 'LEFT_AXIS' or 'RIGHT_AXIS': you're free to decide what's most adapted
+    - the property targetAxis must always be 'BASIC_CHART_AXIS_POSITION_UNSPECIFIED'
+    - the property sheetName must stay as it is and correspond to one of the sheets we've created previously, does not replace it with sheetId
+    - the rest of the properties must be related to what we've created previously`
+    const res = await ChatGptApiUtils.pursueExistingConv(
+      data.parentResId,
+      prompt,
+    )
+
+    const chartData = ChatGptApiUtils.extractJson<ChartData>(res.answer)
+    if (chartData) {
+      await SheetsApiUtils.addCharts(data.spreadSheetsId, chartExample)
+    }
+
     return {
       parentResId: data.parentResId,
       driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
@@ -115,33 +159,5 @@ export class ModelService {
       parentResId: data.parentResId,
       driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
     }
-  }
-
-  private async updateSpreadsheets(
-    spreadSheetId: string,
-    parentResId: string,
-    prompt: string,
-  ): Promise<string> {
-    const res = await ChatGptApiUtils.pursueExistingConv(parentResId, prompt)
-    logger.info(
-      `parentId: ${parentResId}, 
-      answer size : ${JSON.stringify(res.usage)}, 
-      spreadSheetId: ${spreadSheetId}, 
-      prompt: ${0}, 
-      answer: ${res.answer}`,
-    )
-    if (res.usage?.total_tokens && res.usage?.total_tokens > 4000) {
-      logger.warn(
-        `The number of tokens is close to exceeding the limit : ${JSON.stringify(
-          res.usage,
-        )}`,
-      )
-    }
-    await Promise.all(
-      ChatGptApiUtils.extractCode(res.answer).map(async (blockCode) => {
-        await SheetsApiUtils.updateSpreadsheets(spreadSheetId, blockCode)
-      }),
-    )
-    return res.id
   }
 }

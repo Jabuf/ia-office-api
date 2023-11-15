@@ -50,7 +50,7 @@ export class ModelController {
     res: FastifyReply,
   ): Promise<void> => {
     const modelService = new ModelService()
-    const spreadSheetInfo = await modelService.updateGraphics(req.body)
+    const spreadSheetInfo = await modelService.updateCharts(req.body)
     await HttpControllerUtils.sendPutResponse<SpreadSheetInfo>(
       res,
       spreadSheetInfo,

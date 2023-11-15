@@ -1,10 +1,8 @@
-import vm from 'vm'
 import { google, sheets_v4 } from 'googleapis'
 import GoogleApiUtils from './GoogleApiUtils'
 import DriveApiUtils from './DriveApiUtils'
 import { CustomError } from '../errors/CustomError'
 import { GaxiosError } from 'gaxios'
-import { logger } from '../logging/logger'
 
 export type SpreadsheetData = {
   title: string
@@ -14,6 +12,40 @@ export type SpreadsheetData = {
 type SheetData = {
   name: string
   values: string[][]
+}
+
+type BasicCharType =
+  | 'BAR'
+  | 'LINE'
+  | 'AREA'
+  | 'COLUMN'
+  | 'SCATTER'
+  | 'STEPPED_AREA'
+
+type SourceData = {
+  sheetName?: string
+  sheetId?: number
+  startRowIndex: number
+  endRowIndex: number
+  startColumnIndex: number
+  endColumnIndex: number
+}
+
+export type ChartData = {
+  title: string
+  chartType: BasicCharType
+  axes: {
+    title: string
+    position: 'BOTTOM_AXIS' | 'LEFT_AXIS' | 'RIGHT_AXIS'
+  }[]
+  series: {
+    series: {
+      sourceRange: {
+        sources: SourceData[]
+      }
+    }
+    targetAxis: 'BASIC_CHART_AXIS_POSITION_UNSPECIFIED'
+  }[]
 }
 
 export default abstract class SheetsApiUtils extends GoogleApiUtils {
@@ -111,30 +143,64 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
     )
   }
 
-  static async updateSpreadsheets(
+  static async addCharts(
     spreadsheetId: string,
-    code: string,
+    chartData: ChartData,
   ): Promise<void> {
-    const codeToRun = `const { sheets } = this;
-    const spreadsheetId = '${spreadsheetId}';
-      async function updateSpreadsheets() { ${code} }
-      updateSpreadsheets();
-      `
-    const context = {
-      sheets: this.sheets,
-      codeToRun,
-    }
-    logger.info(`codeRun : ${codeToRun}`)
-
     try {
-      const script = new vm.Script(codeToRun)
-      await script.runInNewContext(context)
+      await Promise.all(
+        chartData.series.map(
+          async (series) =>
+            await Promise.all(
+              series.series.sourceRange.sources.map(async (chartData) => {
+                if (chartData.sheetName) {
+                  chartData.sheetId = await this.getSheetIdByName(
+                    spreadsheetId,
+                    chartData.sheetName,
+                  )
+                  delete chartData.sheetName
+                }
+              }),
+            ),
+        ),
+      )
+      await this.sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+          requests: [
+            {
+              addChart: {
+                chart: {
+                  spec: {
+                    title: chartData.title,
+                    basicChart: {
+                      chartType: chartData.chartType,
+                      axis: [
+                        ...chartData.axes.map((axis) => {
+                          return {
+                            title: axis.title,
+                            position: axis.position,
+                          }
+                        }),
+                      ],
+                      series: chartData.series,
+                    },
+                  },
+                  position: {
+                    newSheet: true,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      })
     } catch (err) {
       if (err instanceof GaxiosError) {
         throw new CustomError('ERROR_GOOGLE_API', err.message, err.name)
       }
       if (err instanceof Error) {
-        throw new CustomError('ERROR_RUN_CODE', err.message, err.name)
+        throw new CustomError('UNKNOWN_ERROR', err.message, err.name)
       }
     }
   }
@@ -142,20 +208,20 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
   static async getSheetIdByName(
     spreadsheetId: string,
     sheetName: string,
-  ): Promise<number | null> {
+  ): Promise<number | undefined> {
     const sheets = (
       await this.sheets.spreadsheets.get({
         spreadsheetId,
       })
     ).data.sheets
 
-    let sheetId = null
+    let sheetId
     if (sheets) {
       const sheet = sheets.find(
         (sheet) => sheet.properties?.title === sheetName,
       )
       if (sheet) {
-        sheetId = sheet.properties?.sheetId ?? null
+        sheetId = sheet.properties?.sheetId ?? undefined
       }
     }
 
