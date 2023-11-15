@@ -44,15 +44,21 @@ export default abstract class ChatGptApiUtils {
 
   static async pursueExistingConv(
     parentMessageId: string,
-    message: string,
+    prompt: string,
   ): Promise<GPTResponse> {
     try {
       const start = performance.now()
-      const res = await this.chatGptApi.sendMessage(message, {
+      const res = await this.chatGptApi.sendMessage(prompt, {
         parentMessageId,
       })
       const end = performance.now()
-      logger.info(`gpt execution time: ${((end - start) / 1000).toFixed(0)}`)
+      logger.info(
+        `parentId: ${parentMessageId}, 
+      answer size : ${JSON.stringify(res.detail?.usage)},
+      execution time: ${((end - start) / 1000).toFixed(0)}, 
+      answer: ${res.text},
+      prompt: ${prompt}`,
+      )
       return {
         id: res.id,
         answer: res.text,
