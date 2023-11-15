@@ -3,6 +3,7 @@ import GoogleApiUtils from './GoogleApiUtils'
 import DriveApiUtils from './DriveApiUtils'
 import { CustomError } from '../errors/CustomError'
 import { GaxiosError } from 'gaxios'
+import ColorUtils from './ColorUtils'
 
 export type SpreadsheetData = {
   title: string
@@ -119,9 +120,11 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
         )
         try {
           if (sheetId) {
+            const columns = sheetData.values[0].length
+            const rows = sheetData.values.length
             const range = `${sheetData.name}!A1:${String.fromCharCode(
-              'A'.charCodeAt(0) + sheetData.values[0].length,
-            )}${sheetData.values.length}`
+              'A'.charCodeAt(0) + columns,
+            )}${rows}`
             await this.sheets.spreadsheets.values.update({
               spreadsheetId,
               range,
@@ -130,6 +133,7 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
                 values: sheetData.values,
               },
             })
+            await this.addStyle(spreadsheetId, sheetId, columns, rows)
           }
         } catch (err) {
           if (err instanceof GaxiosError) {
@@ -141,6 +145,72 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
         }
       }),
     )
+  }
+
+  static async addStyle(
+    spreadsheetId: string,
+    sheetId: number,
+    columns: number,
+    rows: number,
+  ) {
+    const theme = ColorUtils.getRandomColorTheme()
+    const requests = {
+      spreadsheetId,
+      resource: {
+        requests: [
+          // header
+          {
+            repeatCell: {
+              range: {
+                sheetId: sheetId,
+                startRowIndex: 0,
+                endRowIndex: 1,
+                startColumnIndex: 0,
+                endColumnIndex: columns,
+              },
+              cell: {
+                userEnteredFormat: {
+                  backgroundColor: theme.backgroundColorHeader,
+                  horizontalAlignment: 'CENTER',
+                  textFormat: {
+                    foregroundColor: theme.foregroundColorHeader,
+                    fontSize: 11,
+                    bold: true,
+                  },
+                },
+              },
+              fields:
+                'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)',
+            },
+          },
+          // rows
+          {
+            repeatCell: {
+              range: {
+                sheetId: sheetId,
+                startRowIndex: 1,
+                endRowIndex: rows,
+                startColumnIndex: 0,
+                endColumnIndex: columns,
+              },
+              cell: {
+                userEnteredFormat: {
+                  backgroundColor: theme.backgroundColorRows,
+                  horizontalAlignment: 'CENTER',
+                  textFormat: {
+                    foregroundColor: theme.foregroundColorRows,
+                    fontSize: 10,
+                  },
+                },
+              },
+              fields:
+                'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)',
+            },
+          },
+        ],
+      },
+    }
+    await SheetsApiUtils.sheets.spreadsheets.batchUpdate(requests)
   }
 
   static async addCharts(
