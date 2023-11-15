@@ -147,17 +147,4 @@ export class ModelService {
       driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
     }
   }
-
-  async updateStyles(data: Conv): Promise<SpreadSheetInfo> {
-    // const prompt = `For this step I want you to add style to the tables with colors, borders, fonts, etc.`
-    // data.parentResId = await this.updateSpreadsheets(
-    //   data.spreadSheetsId,
-    //   data.parentResId,
-    //   prompt,
-    // )
-    return {
-      parentResId: data.parentResId,
-      driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
-    }
-  }
 }

@@ -45,24 +45,12 @@ export class ModelController {
     )
   }
 
-  updateGraphics = async (
+  updateCharts = async (
     req: FastifyRequest<{ Body: Conv }>,
     res: FastifyReply,
   ): Promise<void> => {
     const modelService = new ModelService()
     const spreadSheetInfo = await modelService.updateCharts(req.body)
-    await HttpControllerUtils.sendPutResponse<SpreadSheetInfo>(
-      res,
-      spreadSheetInfo,
-    )
-  }
-
-  updateStyles = async (
-    req: FastifyRequest<{ Body: Conv }>,
-    res: FastifyReply,
-  ): Promise<void> => {
-    const modelService = new ModelService()
-    const spreadSheetInfo = await modelService.updateStyles(req.body)
     await HttpControllerUtils.sendPutResponse<SpreadSheetInfo>(
       res,
       spreadSheetInfo,
