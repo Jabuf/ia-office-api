@@ -33,18 +33,6 @@ export class ModelController {
     )
   }
 
-  updateExamples = async (
-    req: FastifyRequest<{ Body: Conv }>,
-    res: FastifyReply,
-  ): Promise<void> => {
-    const modelService = new ModelService()
-    const spreadSheetInfo = await modelService.updateExamples(req.body)
-    await HttpControllerUtils.sendPutResponse<SpreadSheetInfo>(
-      res,
-      spreadSheetInfo,
-    )
-  }
-
   updateFormulas = async (
     req: FastifyRequest<{ Body: Conv }>,
     res: FastifyReply,
@@ -79,16 +67,5 @@ export class ModelController {
       res,
       spreadSheetInfo,
     )
-  }
-
-  collectInformation = async (
-    req: FastifyRequest<{
-      Querystring: Conv
-    }>,
-    res: FastifyReply,
-  ): Promise<void> => {
-    const modelService = new ModelService()
-    const conv = await modelService.collectInformation(req.query)
-    await HttpControllerUtils.sendGetResponse<Conv>(res, conv)
   }
 }

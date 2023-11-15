@@ -49,7 +49,8 @@ export class ModelService {
       `parentId: ${gptRes.id}, 
       answer size : ${JSON.stringify(res.usage)}, 
       spreadSheetId: ${data.spreadSheetsId}, 
-      answer: ${res.answer}`,
+      answer: ${res.answer},
+      prompt: ${prompt}`,
     )
 
     const spreadsheetData = ChatGptApiUtils.extractJson<SpreadsheetData>(
@@ -71,19 +72,6 @@ export class ModelService {
       await SheetsApiUtils.removeInitialSheet(data.spreadSheetsId)
     }
 
-    return {
-      parentResId: data.parentResId,
-      driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
-    }
-  }
-
-  async updateExamples(data: Conv): Promise<SpreadSheetInfo> {
-    // const prompt = `For this step I want you to populate these tables with examples while following the same instructions as the previous request..`
-    // data.parentResId = await this.updateSpreadsheets(
-    //   data.spreadSheetsId,
-    //   data.parentResId,
-    //   prompt,
-    // )
     return {
       parentResId: data.parentResId,
       driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
