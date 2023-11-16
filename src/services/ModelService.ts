@@ -12,17 +12,19 @@ export const spreadsheetExample: SpreadsheetData = {
     {
       name: 'MySheet1',
       values: [
-        ['Name', 'Sales'],
-        ['John', '123'],
-        ['Robert', '456'],
+        ['Name', 'Sales (€)'],
+        ['John', '10000'],
+        ['Robert', '5000'],
+        ['Total', '=SUM(B2:B3)'],
       ],
     },
     {
       name: 'MySheet2',
       values: [
-        ['Global sales', 'Month'],
-        ['123', 'january'],
-        ['456', 'march'],
+        ['Sales', 'January', 'February', 'March', 'Total'],
+        ['Cheese', '100', '150', '100', '=SUM(B2:C2)'],
+        ['Milk', '200', '300', '300', '=SUM(B3:C3)'],
+        ['Lamb', '50', '25', '25', '=SUM(B4:C4)'],
       ],
     },
   ],
