@@ -108,19 +108,6 @@ export class ModelService {
     }
   }
 
-  async updateFormulas(data: Conv): Promise<SpreadSheetInfo> {
-    // const prompt = `For this step I want you to add formulas inside cells to help the user of this table as much as possible while following the same instructions as the previous request.`
-    // data.parentResId = await this.updateSpreadsheets(
-    //   data.spreadSheetsId,
-    //   data.parentResId,
-    //   prompt,
-    // )
-    return {
-      parentResId: data.parentResId,
-      driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
-    }
-  }
-
   async updateCharts(data: Conv): Promise<SpreadSheetInfo> {
     // TODO manage multiple charts
     // TODO Ask for advice about charts instead of the pure data
