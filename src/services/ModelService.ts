@@ -12,19 +12,24 @@ export const spreadsheetExample: SpreadsheetData = {
     {
       name: 'MySheet1',
       values: [
-        ['Name', 'Sales (€)'],
-        ['John', '10000'],
-        ['Robert', '5000'],
-        ['Total', '=SUM(B2:B3)'],
+        ['Product', 'Month', 'Vendor', 'Amount'],
+        ['Cheese', 'January', 'John', '150'],
+        ['Cheese', 'February', 'John', '50'],
+        ['Milk', 'January', 'John', '200'],
+        ['Lamb', 'March', 'John', '15'],
+        ['Cheese', 'February', 'Robert', '25'],
+        ['Milk', 'January', 'Robert', '50'],
+        ['Milk', 'February', 'Robert', '100'],
+        ['Milk', 'March', 'Robert', '100'],
       ],
     },
     {
       name: 'MySheet2',
       values: [
-        ['Sales', 'January', 'February', 'March', 'Total'],
-        ['Cheese', '100', '150', '100', '=SUM(B2:C2)'],
-        ['Milk', '200', '300', '300', '=SUM(B3:C3)'],
-        ['Lamb', '50', '25', '25', '=SUM(B4:C4)'],
+        ['Name', 'Total Sales (€)'],
+        ['John', '=SUM(FILTER(MySheet1!D2:D9,A2=MySheet1!C2:C9))'],
+        ['Robert', '=SUM(FILTER(MySheet1!D2:D9,A3=MySheet1!C2:C9))'],
+        ['Total', '=SUM(B2:B3)'],
       ],
     },
   ],
@@ -71,16 +76,22 @@ export class ModelService {
   }
 
   async createSpreadsheet(data: Conv): Promise<SpreadSheetInfo> {
-    const initialPrompt = `I will give you a prompt that have for goal the creation of a spreadsheet.
-        I want you to give me an exhaustive list of information I could put in that spreadsheet, like tables, sheets or graphs.
-        I want the label in your answers to use the same language used in the prompt while you'll continue to converse with me in English.
-        The prompt is "${data.initialPrompt}"`
+    const initialPrompt = `I want you to act as my advisor for the creation of a spreadsheet.
+    First I will give you a prompt and you will reply with an exhaustive list of information I could put in that spreadsheet (like tables, sheets, formulas or graphs) related to that prompt.
+    Additionally I also want you to act as a translator if needed, indeed if my prompt is not in english then it is imperative for your answers to reflect the language used in the prompt for all your answers.
+    The prompt is "${data.initialPrompt}"`
     const gptRes = await ChatGptApiUtils.startConv(initialPrompt)
 
-    const prompt = `Now I want to create a Sheets file using the Sheets API. 
+    const prompt = `Now I want to create a spreadsheet using the Sheets API. 
+    The spreadsheet must contain the information that you gave me previously and it must be populated with examples and comment. 
+    The goal for the spreadsheet is to be easily modifiable by anybody so that they can adapt it to their needs. 
     Your role will be to provide me with JSON objects that I will use in my functions.
-    First I want you to return me the a JSON object following the example that I will give you and that will contain the information you mentioned previously:
-    ${JSON.stringify(spreadsheetExample)}`
+    First I want you to return me a JSON object following the example that I will give you and that will contain the information you mentioned previously. 
+    The example serves as a baseline to give you the structure of the JSON object I'm expecting, but its content will usually be vastly different.
+    It is imperative for the spreadsheet (which include the sheets, the labels, the formulas, the way information are presented, etc.) to reflect the information you gave me previously as much as possible while keeping the exact same JSON structure.
+    That means that for example you can add as much elements in array properties as you want, but you cannot add or remove properties.
+    Here's the example : ${JSON.stringify(spreadsheetExample)}.
+    Also don't forget your role as a translator.`
     const res = await ChatGptApiUtils.pursueExistingConv(gptRes.id, prompt)
 
     const spreadsheetData = ChatGptApiUtils.extractJson<SpreadsheetData>(
