@@ -6,6 +6,7 @@ import SheetsApiUtils, {
 } from '../utils/google/SheetsApiUtils'
 import ChatGptApiUtils from '../utils/openai/ChatGptApiUtils'
 import { logger } from '../utils/logging/logger'
+import { CustomError } from '../utils/errors/CustomError'
 
 export const spreadsheetExample: SpreadsheetData = {
   title: 'My spreadsheet title',
@@ -109,6 +110,15 @@ export class ModelService {
     const spreadsheetData = ChatGptApiUtils.extractJson<SpreadsheetData>(
       res.answer,
     )
+
+    if (!spreadsheetData) {
+      throw new CustomError(
+        'ERROR_JSON',
+        `The answer does not contain a valid JSON block : ${res.answer}`,
+        'ERROR_JSON',
+      )
+    }
+
     data.spreadSheetsId = await SheetsApiUtils.createSpreadSheets(
       spreadsheetData.title,
     )
