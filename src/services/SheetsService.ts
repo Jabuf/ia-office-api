@@ -30,9 +30,7 @@ export class SheetsService {
       if (err instanceof GaxiosError) {
         throw new CustomError('ERROR_GOOGLE_API', err.message, err.name)
       }
-      if (err instanceof Error) {
-        throw new CustomError('ERROR_RUN_CODE', err.message, err.name)
-      }
+      throw err
     }
   }
 }
