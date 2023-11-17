@@ -5,6 +5,7 @@ import SheetsApiUtils, {
   SpreadsheetData,
 } from '../utils/google/SheetsApiUtils'
 import ChatGptApiUtils from '../utils/openai/ChatGptApiUtils'
+import { logger } from '../utils/logging/logger'
 
 export const spreadsheetExample: SpreadsheetData = {
   title: 'My spreadsheet title',
@@ -101,6 +102,10 @@ export class ModelService {
       data.spreadSheetsId = await SheetsApiUtils.createSpreadSheets(
         spreadsheetData.title,
       )
+      logger.info(
+        `spreadsheetId: ${data.spreadSheetsId}, prompt: ${initialPrompt}`,
+      )
+
       await SheetsApiUtils.createSheets(
         data.spreadSheetsId,
         spreadsheetData.sheetsData.map((e) => e.name) ?? [],

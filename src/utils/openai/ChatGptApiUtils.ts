@@ -3,7 +3,6 @@ import { ChatGPTAPI } from 'chatgpt'
 import { logger } from '../logging/logger'
 import { CustomError, errorOpenAi } from '../errors/CustomError'
 import { CreateCompletionResponseUsage } from 'openai'
-import PromptUtils from './PromptUtils'
 
 dotenv.config()
 
@@ -83,10 +82,12 @@ export default abstract class ChatGptApiUtils {
     return codeBlocks
   }
 
-  static async startSheetsApiConv(): Promise<string> {
+  static async getStatus(): Promise<boolean> {
     try {
-      const res = await this.chatGptApi.sendMessage(PromptUtils.sheetsApi)
-      return res.id
+      await this.chatGptApi.sendMessage(`Are you up ?`, {
+        timeoutMs: 5000,
+      })
+      return true
     } catch (err) {
       logger.error(err)
       throw errorOpenAi

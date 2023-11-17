@@ -18,5 +18,4 @@ export const errorOpenAi = new CustomError(
   'ERROR_OPENAI',
   'There was a problem while communicating with ChatGPT',
   'ERROR_OPENAI',
-  500,
 )

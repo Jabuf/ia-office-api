@@ -16,4 +16,9 @@ export default async function modelRouter(fastify: FastifyInstance) {
     url: `${basePath}/charts`,
     handler: modelController.updateCharts,
   })
+  fastify.route({
+    method: 'GET',
+    url: `${basePath}/status`,
+    handler: modelController.getStatus,
+  })
 }
