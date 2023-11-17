@@ -23,6 +23,7 @@ export const spreadsheetExample: SpreadsheetData = {
         ['Milk', 'February', 'Robert', '100'],
         ['Milk', 'March', 'Robert', '100'],
       ],
+      comment: 'Here you can find some useful comments.',
     },
     {
       name: 'MySheet2',
@@ -32,6 +33,7 @@ export const spreadsheetExample: SpreadsheetData = {
         ['Robert', '=SUM(FILTER(MySheet1!D2:D9,A3=MySheet1!C2:C9))'],
         ['Total', '=SUM(B2:B3)'],
       ],
+      comment: 'Here you can find some useful comments.',
     },
   ],
 }
@@ -87,36 +89,43 @@ export class ModelService {
     The spreadsheet must contain the information that you gave me previously and it must be populated with examples and comment. 
     The goal for the spreadsheet is to be easily modifiable by anybody so that they can adapt it to their needs. 
     Your role will be to provide me with JSON objects that I will use in my functions.
+    It is mandatory for the JSON in your answer to be inside a JSON block that start with \`\`\`json.
     First I want you to return me a JSON object following the example that I will give you and that will contain the information you mentioned previously. 
     The example serves as a baseline to give you the structure of the JSON object I'm expecting, but its content will usually be vastly different.
     It is imperative for the spreadsheet (which include the sheets, the labels, the formulas, the way information are presented, etc.) to reflect the information you gave me previously as much as possible while keeping the exact same JSON structure.
     That means that for example you can add as much elements in array properties as you want, but you cannot add or remove properties.
-    Here's the example : ${JSON.stringify(spreadsheetExample)}.
+    
+    Pay a particular attention to the property comment, it is intended for you to provides inputs on your answer. 
+    It is expected for you to provides lot of information here. 
+    Here's a list of possible things you can put :
+      - Useful URLs related to the content of the sheet
+      - An explanation of the content of the sheet
+      - Explanations on how to efficiently use and adapt this sheet for your use-case, what to modify, add, remove, etc.
+    
+    And here's the example : ${JSON.stringify(spreadsheetExample)}.
     Also don't forget your role as a translator.`
     const res = await ChatGptApiUtils.pursueExistingConv(gptRes.id, prompt)
 
     const spreadsheetData = ChatGptApiUtils.extractJson<SpreadsheetData>(
       res.answer,
     )
-    if (spreadsheetData) {
-      data.spreadSheetsId = await SheetsApiUtils.createSpreadSheets(
-        spreadsheetData.title,
-      )
-      logger.info(
-        `spreadsheetId: ${data.spreadSheetsId}, prompt: ${initialPrompt}`,
-      )
+    data.spreadSheetsId = await SheetsApiUtils.createSpreadSheets(
+      spreadsheetData.title,
+    )
+    logger.info(
+      `spreadsheetId: ${data.spreadSheetsId}, prompt: ${initialPrompt}`,
+    )
 
-      await SheetsApiUtils.createSheets(
-        data.spreadSheetsId,
-        spreadsheetData.sheetsData.map((e) => e.name) ?? [],
-      )
-      await SheetsApiUtils.updateSheet(
-        data.spreadSheetsId,
-        spreadsheetData.sheetsData,
-      )
+    await SheetsApiUtils.createSheets(
+      data.spreadSheetsId,
+      spreadsheetData.sheetsData.map((e) => e.name) ?? [],
+    )
+    await SheetsApiUtils.updateSheet(
+      data.spreadSheetsId,
+      spreadsheetData.sheetsData,
+    )
 
-      await SheetsApiUtils.removeInitialSheet(data.spreadSheetsId)
-    }
+    await SheetsApiUtils.removeInitialSheet(data.spreadSheetsId)
 
     return {
       parentResId: data.parentResId,

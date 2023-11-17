@@ -13,6 +13,7 @@ export type SpreadsheetData = {
 type SheetData = {
   name: string
   values: string[][]
+  comment: string
 }
 
 type BasicCharType =
@@ -131,6 +132,14 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
               valueInputOption: 'USER_ENTERED',
               requestBody: {
                 values: sheetData.values,
+              },
+            })
+            await this.sheets.spreadsheets.values.update({
+              spreadsheetId,
+              range: `${sheetData.name}!A${rows + 2}`,
+              valueInputOption: 'USER_ENTERED',
+              requestBody: {
+                values: [[sheetData.comment]],
               },
             })
             await this.addStyle(spreadsheetId, sheetId, columns, rows)
