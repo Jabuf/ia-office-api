@@ -134,6 +134,28 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
                 values: sheetData.values,
               },
             })
+            // add sorting
+            await this.sheets.spreadsheets.batchUpdate({
+              spreadsheetId,
+              requestBody: {
+                requests: [
+                  {
+                    setBasicFilter: {
+                      filter: {
+                        range: {
+                          sheetId: sheetId,
+                          startRowIndex: 0,
+                          endRowIndex: rows,
+                          startColumnIndex: 0,
+                          endColumnIndex: columns,
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            })
+            // add the comment cell
             await this.sheets.spreadsheets.values.update({
               spreadsheetId,
               range: `${sheetData.name}!A${rows + 2}`,
