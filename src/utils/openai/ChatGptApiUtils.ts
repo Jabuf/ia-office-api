@@ -16,6 +16,9 @@ export default abstract class ChatGptApiUtils {
   static chatGptApi = new ChatGPTAPI({
     apiKey: process.env.OPENAI_API_KEY ?? '',
     debug: process.env.OPENAPI_DEBUG === 'true' ?? false,
+    // TODO try to use 16k context
+    // maxModelTokens: 16385,
+    maxResponseTokens: 2500,
     completionParams: {
       // Available models here : https://platform.openai.com/docs/models/
       // model: process.env.OPENAI_DEFAULT_MODEL ?? '',
@@ -23,7 +26,8 @@ export default abstract class ChatGptApiUtils {
       // model: 'gpt-4',
     },
     systemMessage: `You are ChatGPT, a large language model trained by OpenAI. 
-    Your answers must be complete and contains a number of tokens that, added with the tokens of the question, must be under 4000. Try to be as concise as possible.`,
+    Your answers must be complete and contains a number of tokens that, added with the tokens of the question, must be under 3000. Try to be as concise as possible.
+    Today we are the ${new Date().toDateString()}.`,
   })
   static sheetsParentResId = ''
 
