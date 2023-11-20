@@ -34,7 +34,9 @@ export const spreadsheetExample: SpreadsheetData = {
         ['Robert', '=SUM(FILTER(MySheet1!D2:D9,A3=MySheet1!C2:C9))'],
         ['Total', '=SUM(B2:B3)'],
       ],
-      comment: 'Here you can find some useful comments.',
+      comment:
+        'Here you can find some useful comments.\n' +
+        'You can find more information about how this work here : www.google.com',
     },
   ],
 }
@@ -90,7 +92,7 @@ export class ModelService {
     The spreadsheet must contain the information that you gave me previously and it must be populated with examples and comment. 
     The goal for the spreadsheet is to be easily modifiable by anybody so that they can adapt it to their needs. 
     Your role will be to provide me with JSON objects that I will use in my functions.
-    It is mandatory for the JSON in your answer to be inside a JSON block that start with \`\`\`json.
+    It is mandatory for the JSON in your answer to be inside a JSON block that start with \`\`\`json and this block should never contains any comment like this one : "// to complete".
     First I want you to return me a JSON object following the example that I will give you and that will contain the information you mentioned previously. 
     The example serves as a baseline to give you the structure of the JSON object I'm expecting, but its content will usually be vastly different.
     It is imperative for the spreadsheet (which include the sheets, the labels, the formulas, the way information are presented, etc.) to reflect the information you gave me previously as much as possible while keeping the exact same JSON structure.
@@ -104,7 +106,7 @@ export class ModelService {
       - Explanations on how to efficiently use and adapt this sheet for your use-case, what to modify, add, remove, etc.
     
     And here's the example : ${JSON.stringify(spreadsheetExample)}.
-    Also don't forget your role as a translator.`
+    Also don't forget your role as a translator including the text inside the comment property.`
     const res = await ChatGptApiUtils.pursueExistingConv(gptRes.id, prompt)
 
     const spreadsheetData = ChatGptApiUtils.extractJson<SpreadsheetData>(
