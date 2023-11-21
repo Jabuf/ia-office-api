@@ -31,9 +31,17 @@ export default abstract class ChatGptApiUtils {
   })
   static sheetsParentResId = ''
 
-  static async startConv(message: string): Promise<GPTResponse> {
+  static async startConv(prompt: string): Promise<GPTResponse> {
     try {
-      const res = await this.chatGptApi.sendMessage(message)
+      const start = performance.now()
+      const res = await this.chatGptApi.sendMessage(prompt)
+      const end = performance.now()
+      logger.info(
+        `answer size : ${JSON.stringify(res.detail?.usage)},
+      execution time: ${((end - start) / 1000).toFixed(0)}, 
+      answer: ${res.text},
+      prompt: ${prompt}`,
+      )
       return {
         id: res.id,
         answer: res.text,
