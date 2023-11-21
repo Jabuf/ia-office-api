@@ -13,26 +13,34 @@ export const spreadsheetExample: SpreadsheetData = {
   sheetsData: [
     {
       name: 'MySheet1',
-      values: [
-        ['Product', 'Month', 'Vendor', 'Amount'],
-        ['Cheese', 'January', 'John', '150'],
-        ['Cheese', 'February', 'John', '50'],
-        ['Milk', 'January', 'John', '200'],
-        ['Lamb', 'March', 'John', '15'],
-        ['Cheese', 'February', 'Robert', '25'],
-        ['Milk', 'January', 'Robert', '50'],
-        ['Milk', 'February', 'Robert', '100'],
-        ['Milk', 'March', 'Robert', '100'],
+      tables: [
+        {
+          values: [
+            ['Product', 'Month', 'Vendor', 'Amount'],
+            ['Cheese', 'January', 'John', '150'],
+            ['Cheese', 'February', 'John', '50'],
+            ['Milk', 'January', 'John', '200'],
+            ['Lamb', 'March', 'John', '15'],
+            ['Cheese', 'February', 'Robert', '25'],
+            ['Milk', 'January', 'Robert', '50'],
+            ['Milk', 'February', 'Robert', '100'],
+            ['Milk', 'March', 'Robert', '100'],
+          ],
+        },
       ],
-      comment: 'Here you can find some useful comments.',
+      comment: 'Here you can find some useful comments about this sheet.',
     },
     {
       name: 'MySheet2',
-      values: [
-        ['Name', 'Total Sales (€)'],
-        ['John', '=SUM(FILTER(MySheet1!D2:D9,A2=MySheet1!C2:C9))'],
-        ['Robert', '=SUM(FILTER(MySheet1!D2:D9,A3=MySheet1!C2:C9))'],
-        ['Total', '=SUM(B2:B3)'],
+      tables: [
+        {
+          values: [
+            ['Name', 'Total Sales (€)'],
+            ['John', '=SUM(FILTER(MySheet1!D2:D9,A2=MySheet1!C2:C9))'],
+            ['Robert', '=SUM(FILTER(MySheet1!D2:D9,A3=MySheet1!C2:C9))'],
+            ['Total', '=SUM(B2:B3)'],
+          ],
+        },
       ],
       comment:
         'Here you can find some useful comments.\n' +
@@ -94,7 +102,7 @@ export class ModelService {
     Your role will be to provide me with JSON objects that I will use in my functions.
     It is mandatory for the JSON in your answer to be inside a JSON block that start with \`\`\`json and this block should never contains any comment like this one : "// to complete".
     First I want you to return me a JSON object following the example that I will give you and that will contain the information you mentioned previously. 
-    The example serves as a baseline to give you the structure of the JSON object I'm expecting, but its content will usually be vastly different.
+    The example serves as a baseline to give you the structure of the JSON object I'm expecting, but its content must contain information related to your previous answer.
     It is imperative for the spreadsheet (which include the sheets, the labels, the formulas, the way information are presented, etc.) to reflect the information you gave me previously as much as possible while keeping the exact same JSON structure.
     That means that for example you can add as much elements in array properties as you want, but you cannot add or remove properties.
     

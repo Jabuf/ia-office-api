@@ -12,7 +12,9 @@ export type SpreadsheetData = {
 
 type SheetData = {
   name: string
-  values: string[][]
+  tables: {
+    values: string[][]
+  }[]
   comment: string
 }
 
@@ -121,34 +123,39 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
         )
         try {
           if (sheetId) {
-            const columns = sheetData.values[0].length
-            const rows = sheetData.values.length
-            const range = `${sheetData.name}!A1:${String.fromCharCode(
-              'A'.charCodeAt(0) + columns,
-            )}${rows}`
-            await this.sheets.spreadsheets.values.update({
-              spreadsheetId,
-              range,
-              valueInputOption: 'USER_ENTERED',
-              requestBody: {
-                values: sheetData.values,
-              },
-            })
+            let startRow = 1
+            let endRow = -1
+            await Promise.all(
+              sheetData.tables.map(async (table) => {
+                const columns = table.values[0].length
+                startRow = endRow + 2
+                endRow = startRow + table.values.length - 1
+                await Promise.resolve(
+                  this.updateSheetValues(
+                    spreadsheetId,
+                    sheetId,
+                    sheetData.name,
+                    { startRow, endRow, columns },
+                    table.values,
+                  ),
+                )
+              }),
+            )
             // add sorting and resizing
             await this.sheets.spreadsheets.batchUpdate({
               spreadsheetId,
               requestBody: {
                 requests: [
                   {
-                    // sort
+                    // sort, only the first table will be sorted
                     setBasicFilter: {
                       filter: {
                         range: {
                           sheetId: sheetId,
                           startRowIndex: 0,
-                          endRowIndex: rows,
+                          endRowIndex: sheetData.tables[0].values.length,
                           startColumnIndex: 0,
-                          endColumnIndex: columns,
+                          endColumnIndex: sheetData.tables[0].values[0].length,
                         },
                       },
                     },
@@ -168,13 +175,12 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
             // add the comment cell
             await this.sheets.spreadsheets.values.update({
               spreadsheetId,
-              range: `${sheetData.name}!A${rows + 2}`,
+              range: `${sheetData.name}!A${endRow + 2}`,
               valueInputOption: 'USER_ENTERED',
               requestBody: {
                 values: [[sheetData.comment]],
               },
             })
-            await this.addStyle(spreadsheetId, sheetId, columns, rows)
           }
         } catch (err) {
           if (err instanceof GaxiosError) {
@@ -188,11 +194,38 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
     )
   }
 
+  private static async updateSheetValues(
+    spreadsheetId: string,
+    sheetId: number,
+    sheetName: string,
+    range: {
+      startRow: number
+      endRow: number
+      columns: number
+    },
+    values: string[][],
+  ): Promise<void> {
+    await this.sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `${sheetName}!A${range.startRow}:${String.fromCharCode(
+        'A'.charCodeAt(0) + range.columns - 1,
+      )}${range.endRow}`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values,
+      },
+    })
+    await this.addStyle(spreadsheetId, sheetId, range)
+  }
+
   static async addStyle(
     spreadsheetId: string,
     sheetId: number,
-    columns: number,
-    rows: number,
+    range: {
+      startRow: number
+      endRow: number
+      columns: number
+    },
   ) {
     const theme = ColorUtils.getRandomColorTheme()
     const requests = {
@@ -204,10 +237,10 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
             repeatCell: {
               range: {
                 sheetId: sheetId,
-                startRowIndex: 0,
-                endRowIndex: 1,
+                startRowIndex: range.startRow - 1,
+                endRowIndex: range.startRow,
                 startColumnIndex: 0,
-                endColumnIndex: columns,
+                endColumnIndex: range.columns,
               },
               cell: {
                 userEnteredFormat: {
@@ -229,10 +262,10 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
             repeatCell: {
               range: {
                 sheetId: sheetId,
-                startRowIndex: 1,
-                endRowIndex: rows,
+                startRowIndex: range.startRow,
+                endRowIndex: range.endRow,
                 startColumnIndex: 0,
-                endColumnIndex: columns,
+                endColumnIndex: range.columns,
               },
               cell: {
                 userEnteredFormat: {
