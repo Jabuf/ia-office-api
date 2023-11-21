@@ -18,7 +18,7 @@ export default abstract class ChatGptApiUtils {
     debug: process.env.OPENAPI_DEBUG === 'true' ?? false,
     // TODO try to use 16k context
     // maxModelTokens: 16385,
-    maxResponseTokens: 2500,
+    maxResponseTokens: 3000,
     completionParams: {
       // Available models here : https://platform.openai.com/docs/models/
       // model: process.env.OPENAI_DEFAULT_MODEL ?? '',
