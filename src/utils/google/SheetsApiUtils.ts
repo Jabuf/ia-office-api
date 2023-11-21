@@ -134,12 +134,13 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
                 values: sheetData.values,
               },
             })
-            // add sorting
+            // add sorting and resizing
             await this.sheets.spreadsheets.batchUpdate({
               spreadsheetId,
               requestBody: {
                 requests: [
                   {
+                    // sort
                     setBasicFilter: {
                       filter: {
                         range: {
@@ -149,6 +150,15 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
                           startColumnIndex: 0,
                           endColumnIndex: columns,
                         },
+                      },
+                    },
+                  },
+                  {
+                    // resize
+                    autoResizeDimensions: {
+                      dimensions: {
+                        sheetId,
+                        dimension: 'COLUMNS', // or 'ROWS'
                       },
                     },
                   },
