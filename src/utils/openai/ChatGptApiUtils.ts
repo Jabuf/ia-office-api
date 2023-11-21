@@ -87,6 +87,9 @@ export default abstract class ChatGptApiUtils {
     const arr = chatGptAnswer.split(codeSeparator)
 
     arr.forEach((str) => {
+      // removing comments
+      str = str.replace(/\/\/.*/g, '')
+      str = str.replace(/\/\*[\s\S]*?\*\//g, '')
       if (str.split('\n')[0].trim() === language) {
         codeBlocks.push(str.substring(str.indexOf('\n')))
       }
