@@ -19,14 +19,6 @@ export const spreadsheetExample: SpreadsheetData = {
             ['Milk', 'March', 'Robert', '100'],
           ],
         },
-        {
-          values: [
-            ['Stock', 'January', 'February', 'March'],
-            ['Cheese', '200', '150', '120'],
-            ['Milk', '150', '250', '320'],
-            ['Lamb', '100', '50', '75'],
-          ],
-        },
       ],
       comment: 'Here you can find some useful comments about this sheet.',
     },
@@ -36,8 +28,8 @@ export const spreadsheetExample: SpreadsheetData = {
         {
           values: [
             ['Name', 'Total Sales (€)'],
-            ['John', '=SUM(FILTER(MySheet1!D2:D9,A2=MySheet1!C2:C9))'],
-            ['Robert', '=SUM(FILTER(MySheet1!D2:D9,A3=MySheet1!C2:C9))'],
+            ['John', "=SUM(FILTER('MySheet1'!D2:D9,A2='MySheet1'!C2:C9))"],
+            ['Robert', "=SUM(FILTER('MySheet1'!D2:D9,A3='MySheet1'!C2:C9))"],
             ['Total', '=SUM(B2:B3)'],
           ],
         },

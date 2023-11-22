@@ -10,24 +10,21 @@ export const promptSpreadsheetAdvices = `I want you to act as my advisor for the
     The prompt is `
 
 export const promptSpreadsheetCreation = `I want to create a spreadsheet using the Sheets API.
-    The spreadsheet must contain the information that you gave me previously and it must be populated with examples and comments. 
-    The goal for the spreadsheet is to be easily modifiable by anybody so that they can adapt it to their needs. 
-    Your role will be to provide me with JSON objects that I will use in my functions.
-    It is mandatory for the JSON in your answer to be inside a JSON block that start with \`\`\`json and this block should never contains any comment like this one : "// to complete".
-    First I want you to return me a JSON object following the example that I will give you and that will contain the information you mentioned previously. 
-    The example serves as a baseline to give you the structure of the JSON object I'm expecting, but its content must contain information related to your previous answer.
-    It is imperative for the spreadsheet (which include the sheets, the labels, the formulas, the way information are presented, etc.) to reflect the information you gave me previously as much as possible while keeping the exact same JSON structure.
-    That means that for example you can add as much elements in array properties as you want, but you cannot add or remove properties.
+    The goal is for the spreadsheet to contain the information that you gave me previously, populated with examples and comments. 
+    Also it should be easily modifiable by anybody so that they can adapt it to their needs. 
     
-    Pay a particular attention to the property comment, it is intended for you to provides inputs on your answer. 
-    It is expected for you to provides lot of information here. 
-    Here's a list of possible things you can put :
-      - Useful URLs related to the content of the sheet
-      - An explanation of the content of the sheet
-      - Explanations on how to efficiently use and adapt this sheet for your use-case, what to modify, add, remove, etc.
+    Your role will be to provide me with a JSON object that I will use in my code.
+    It is mandatory for the JSON in your answer to be inside a JSON block that start with \`\`\`json.
+    I will give you an example of a JSON object that will serve as a baseline for the structure of the JSON object I'm expecting.
+    It is imperative for the JSON in your answer to have the same structure that my example, which means that you cannot add or remove properties but you can add as much elements as you want in array properties.
+    The values in my example are placeholder meant to be replaced and it is important for your answer to reflect the information you gave me previously about the creation of a spreadsheet.
+    Also don't forget your role as a translator, the language used inside the JSON object must reflect the language used in the initial prompt.
+    Here's a quick rundown of some properties :
+        - tables : each element of this array represent a table inside the same sheet, feel free to choose the correct number of element
+        - values : the values of a table, each element of this array represent a row with the first element being the header. All elements inside a same table should have the same length.
+        - comment : intended for you to provides inputs on your answer, notably explanations on how to efficiently use and adapt the corresponding sheet for a different use-case
     
-    And here's the example : ${JSON.stringify(spreadsheetExample)}.
-    Also don't forget your role as a translator including the text inside the comment property.`
+    Here's the example : ${JSON.stringify(spreadsheetExample)}.`
 
 export const promptChartsCreation = `Now I want to add a chart to my Sheets file. 
     Your role will be to provide me with JSON objects that I will use in my functions.
