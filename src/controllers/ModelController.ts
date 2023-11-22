@@ -2,11 +2,10 @@ import { HttpControllerUtils } from '../utils/HttpControllerUtils'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { ModelService } from '../services/ModelService'
 import { DriveFileInfo } from './SheetsController'
-import ChatGptApiUtils from '../utils/openai/ChatGptApiUtils'
+import GptApiUtils from '../utils/openai/GptApiUtils'
 
 export type Conv = {
   initialPrompt: string
-  additionalInfo: AdditionalInfo[]
   spreadSheetsId: string
   parentResId: string
 }
@@ -47,7 +46,7 @@ export class ModelController {
   }
 
   getStatus = async (req: FastifyRequest, res: FastifyReply): Promise<void> => {
-    const status = await ChatGptApiUtils.getStatus()
+    const status = await GptApiUtils.getStatus()
     await HttpControllerUtils.sendGetResponse<{ status: boolean }>(res, {
       status,
     })

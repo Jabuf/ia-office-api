@@ -1,16 +1,12 @@
 import { Conv, SpreadSheetInfo } from '../controllers/ModelController'
 import { SheetsService } from './SheetsService'
-import SheetsApiUtils, {
-  ChartData,
-  SpreadsheetData,
-} from '../utils/google/SheetsApiUtils'
-import ChatGptApiUtils from '../utils/openai/ChatGptApiUtils'
+import SheetsApiUtils, { SpreadsheetData } from '../utils/google/SheetsApiUtils'
+import GptApiUtils from '../utils/openai/GptApiUtils'
 import { logger } from '../utils/logging/logger'
-import { CustomError } from '../utils/errors/CustomError'
+import { CustomError, errorOpenAi } from '../utils/errors/CustomError'
 import {
-  promptChartsCreation,
-  promptSpreadsheetAdvices,
-  promptSpreadsheetCreation,
+  getPromptsSpreadsheetAdvices,
+  getPromptsSpreadsheetCreation,
 } from '../data/prompts'
 
 export class ModelService {
@@ -21,22 +17,27 @@ export class ModelService {
   }
 
   async createSpreadsheet(data: Conv): Promise<SpreadSheetInfo> {
-    const initialPrompt = `${promptSpreadsheetAdvices} "${data.initialPrompt}"`
-    const gptRes = await ChatGptApiUtils.startConv(initialPrompt)
-
-    const res = await ChatGptApiUtils.pursueExistingConv(
-      gptRes.id,
-      promptSpreadsheetCreation,
+    const chatCompletion = await GptApiUtils.startConv(
+      getPromptsSpreadsheetAdvices(data.initialPrompt),
     )
 
-    const spreadsheetData = ChatGptApiUtils.extractJson<SpreadsheetData>(
-      res.answer,
-    )
+    const res = await GptApiUtils.startConv(getPromptsSpreadsheetCreation(), {
+      previousMessages: [chatCompletion.choices[0].message],
+      returnJson: true,
+    })
+
+    if (!res.choices[0].message.content) {
+      throw errorOpenAi
+    }
+
+    const spreadsheetData = JSON.parse(
+      res.choices[0].message.content,
+    ) as SpreadsheetData
 
     if (!spreadsheetData) {
       throw new CustomError(
         'ERROR_JSON',
-        `The answer does not contain a valid JSON block : ${res.answer}`,
+        `The answer does not contain a valid JSON block : ${res.choices[0].message.content}`,
         'ERROR_JSON',
       )
     }
@@ -45,7 +46,7 @@ export class ModelService {
       spreadsheetData.title,
     )
     logger.info(
-      `spreadsheetId: ${data.spreadSheetsId}, prompt: ${initialPrompt}`,
+      `spreadsheetId: ${data.spreadSheetsId}, prompt: ${data.initialPrompt}`,
     )
 
     await SheetsApiUtils.createSheets(
@@ -68,15 +69,15 @@ export class ModelService {
   async updateCharts(data: Conv): Promise<SpreadSheetInfo> {
     // TODO manage multiple charts
     // TODO Ask for advice about charts instead of the pure data
-    const res = await ChatGptApiUtils.pursueExistingConv(
-      data.parentResId,
-      promptChartsCreation,
-    )
-
-    const chartData = ChatGptApiUtils.extractJson<ChartData>(res.answer)
-    if (chartData) {
-      await SheetsApiUtils.addCharts(data.spreadSheetsId, chartData)
-    }
+    // const res = await GptApiUtils.pursueExistingConv(
+    //   data.parentResId,
+    //   promptChartsCreation,
+    // )
+    //
+    // const chartData = GptApiUtils.extractJson<ChartData>(res.answer)
+    // if (chartData) {
+    //   await SheetsApiUtils.addCharts(data.spreadSheetsId, chartData)
+    // }
 
     return {
       parentResId: data.parentResId,

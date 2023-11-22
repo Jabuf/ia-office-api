@@ -1,15 +1,39 @@
 import { chartExample, spreadsheetExample } from './examples'
+import { ChatCompletionMessageParam } from 'openai/src/resources/chat/completions'
 
-export const promptSystemMessage = `You are ChatGPT, a large language model trained by OpenAI. 
-    Your answers must be complete and contains a number of tokens that, added with the tokens of the question, must be under 3000. Try to be as concise as possible.
-    Today we are the ${new Date().toDateString()}.`
+export const promptSystem: ChatCompletionMessageParam = {
+  role: 'system',
+  content: `You are ChatGPT, a large language model trained by OpenAI. Today we are the ${new Date().toDateString()}.`,
+}
 
-export const promptSpreadsheetAdvices = `I want you to act as my advisor for the creation of a spreadsheet.
-    First I will give you a prompt and you will reply with an exhaustive list of information I could put in that spreadsheet (like tables, sheets, formulas or graphs) related to that prompt.
+export const promptJson: ChatCompletionMessageParam = {
+  role: 'system',
+  content: `You are a helpful assistant designed to output JSON.`,
+}
+
+export const getPromptsSpreadsheetAdvices = (
+  prompt: string,
+): ChatCompletionMessageParam[] => {
+  return [
+    {
+      role: 'system',
+      content: `I want you to act as my advisor for the creation of a spreadsheet.`,
+    },
+    {
+      role: 'user',
+      content: `First I will give you a prompt and you will reply with an exhaustive list of information I could put in that spreadsheet (like tables, sheets, formulas or graphs) related to that prompt.
     Additionally I also want you to act as a translator if needed, indeed if my prompt is not in english then it is imperative for your answers to reflect the language used in the prompt for all your answers.
-    The prompt is `
+    The prompt is ${prompt}`,
+    },
+  ]
+}
 
-export const promptSpreadsheetCreation = `I want to create a spreadsheet using the Sheets API.
+export const getPromptsSpreadsheetCreation =
+  (): ChatCompletionMessageParam[] => {
+    return [
+      {
+        role: 'user',
+        content: `I want to create a spreadsheet using the Sheets API.
     The goal is for the spreadsheet to contain the information that you gave me previously, populated with examples and comments. 
     Also it should be easily modifiable by anybody so that they can adapt it to their needs. 
     
@@ -24,7 +48,10 @@ export const promptSpreadsheetCreation = `I want to create a spreadsheet using t
         - values : the values of a table, each element of this array represent a row with the first element being the header. All elements inside a same table should have the same length.
         - comment : intended for you to provides inputs on your answer, notably explanations on how to efficiently use and adapt the corresponding sheet for a different use-case
     
-    Here's the example : ${JSON.stringify(spreadsheetExample)}.`
+    Here's the example : ${JSON.stringify(spreadsheetExample)}.`,
+      },
+    ]
+  }
 
 export const promptChartsCreation = `Now I want to add a chart to my Sheets file. 
     Your role will be to provide me with JSON objects that I will use in my functions.
