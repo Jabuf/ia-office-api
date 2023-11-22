@@ -3,6 +3,7 @@ import { ChatGPTAPI } from 'chatgpt'
 import { logger } from '../logging/logger'
 import { CustomError, errorOpenAi } from '../errors/CustomError'
 import { CreateCompletionResponseUsage } from 'openai'
+import { promptSystemMessage } from '../../data/prompts'
 
 dotenv.config()
 
@@ -25,9 +26,7 @@ export default abstract class ChatGptApiUtils {
       model: 'gpt-3.5-turbo-1106',
       // model: 'gpt-4',
     },
-    systemMessage: `You are ChatGPT, a large language model trained by OpenAI. 
-    Your answers must be complete and contains a number of tokens that, added with the tokens of the question, must be under 3000. Try to be as concise as possible.
-    Today we are the ${new Date().toDateString()}.`,
+    systemMessage: promptSystemMessage,
   })
   static sheetsParentResId = ''
 
