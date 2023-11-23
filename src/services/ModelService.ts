@@ -4,10 +4,7 @@ import SheetsApiUtils, { SpreadsheetData } from '../utils/google/SheetsApiUtils'
 import GptApiUtils from '../utils/openai/GptApiUtils'
 import { logger } from '../utils/logging/logger'
 import { CustomError, errorOpenAi } from '../utils/errors/CustomError'
-import {
-  getPromptsSpreadsheetAdvices,
-  getPromptsSpreadsheetCreation,
-} from '../data/prompts'
+import { getPromptsSpreadsheetCreation } from '../data/prompts'
 
 export class ModelService {
   readonly sheetsService
@@ -17,14 +14,12 @@ export class ModelService {
   }
 
   async createSpreadsheet(data: Conv): Promise<SpreadSheetInfo> {
-    const chatCompletion = await GptApiUtils.startConv(
-      getPromptsSpreadsheetAdvices(data.initialPrompt),
+    const res = await GptApiUtils.startConv(
+      getPromptsSpreadsheetCreation(data.initialPrompt),
+      {
+        returnJson: true,
+      },
     )
-
-    const res = await GptApiUtils.startConv(getPromptsSpreadsheetCreation(), {
-      previousMessages: [chatCompletion.choices[0].message],
-      returnJson: true,
-    })
 
     if (!res.choices[0].message.content) {
       throw errorOpenAi

@@ -5,7 +5,6 @@ import { OpenAI } from 'openai'
 import { ChatCompletion } from 'openai/resources'
 import { ChatCompletionMessageParam } from 'openai/src/resources/chat/completions'
 import { OpenAIError } from 'openai/error'
-import { promptJson, promptSystem } from '../../data/prompts'
 
 dotenv.config()
 
@@ -24,17 +23,9 @@ export default abstract class GptApiUtils {
   ): Promise<ChatCompletion> {
     try {
       // Chat completion documentation : https://platform.openai.com/docs/api-reference/chat/create
-      const promptsSystem: ChatCompletionMessageParam[] = [promptSystem]
-      if (options?.returnJson) {
-        promptsSystem.push(promptJson)
-      }
       const start = performance.now()
       const chatCompletion = await this.openai.chat.completions.create({
-        messages: [
-          ...promptsSystem,
-          ...(options?.previousMessages ?? []),
-          ...messages,
-        ],
+        messages: [...(options?.previousMessages ?? []), ...messages],
         model: this.defaultModel,
         response_format: { type: options?.returnJson ? 'json_object' : 'text' },
       })
