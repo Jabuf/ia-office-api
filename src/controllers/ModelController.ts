@@ -15,11 +15,6 @@ export type SpreadSheetInfo = {
   driveFileInfo: DriveFileInfo
 }
 
-export type AdditionalInfo = {
-  question: string
-  answer: string
-}
-
 export class ModelController {
   createSpreadsheet = async (
     req: FastifyRequest<{ Body: Conv }>,
