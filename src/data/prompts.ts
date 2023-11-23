@@ -14,7 +14,7 @@ export const getPromptsSpreadsheetCreation = (
       role: 'system',
       content: `${promptSystem.content ?? ''}. 
       You will act as a advisor for the creation of a spreadsheet and will output JSON.
-      You will also act as a translator if needed. Indeed, if the following extract is not in english, then you must translate your answer to this language, even if I continue to talk to you in english.
+      You will also act as a translator. Indeed, if the following extract is not in english, then you must translate all your answers to this language, even if I continue to talk to you in english.
       The extract : ${prompt.substring(0, 50)}`,
     },
     {
@@ -27,11 +27,13 @@ export const getPromptsSpreadsheetCreation = (
       The values in my example are placeholder meant to be replaced, they shouldn't be present in your answer.
       Here's the example : ${JSON.stringify(spreadsheetExample)}.
       
-      I want you to return this JSON with a content related to the prompt above. If specific instructions were given about sheets or tables, they must be respected.
+      I want you to return this JSON with a content related to the prompt above. It is imperative for the language of the content to respect your role as a translator and be in the same language as the prompt. 
+      If specific instructions were given about sheets or tables, they must be respected.
       Here's a quick rundown of some properties of the JSON object :
           - tables : each element of this array represent a table inside the same sheet, feel free to choose the correct number of element
           - values : the values of a table, each element of this array represent a row with the first element being the header. All elements inside a same table should have the same length.
-          - comment : intended for you to provides inputs on your answer, notably explanations on how to efficiently use and adapt the corresponding sheet for a different use-case`,
+          - comment : intended for you to provides inputs on your answer. This is mandatory and should lengthy. 
+            It includes : if you have used formulas where they are and what they do, general information about the tables, instructions on how to adapt the sheet to similar use-cases, urls providing explanation on how to fill the data if relevant.`,
     },
   ]
 }
