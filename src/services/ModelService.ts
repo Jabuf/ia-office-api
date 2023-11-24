@@ -5,8 +5,8 @@ import GptApiUtils from '../utils/openai/GptApiUtils'
 import { logger } from '../utils/logging/logger'
 import { CustomError, errorOpenAi } from '../utils/errors/CustomError'
 import {
-  getPromptsSpreadsheetCreationA,
-  getPromptsSpreadsheetCreationB,
+  getPromptsSpreadsheetAssisted,
+  getPromptsSpreadsheetInstructions,
 } from '../data/prompts'
 
 export class ModelService {
@@ -20,14 +20,14 @@ export class ModelService {
     let chatCompletion
     if (data.assistedMode) {
       chatCompletion = await GptApiUtils.startConv(
-        getPromptsSpreadsheetCreationA(data.initialPrompt),
+        getPromptsSpreadsheetAssisted(data.initialPrompt),
         {
           returnJson: true,
         },
       )
     } else {
       chatCompletion = await GptApiUtils.startConv(
-        getPromptsSpreadsheetCreationB(data.initialPrompt),
+        getPromptsSpreadsheetInstructions(data.initialPrompt),
         {
           returnJson: true,
         },
@@ -54,7 +54,11 @@ export class ModelService {
       spreadsheetData.title,
     )
     logger.info(
-      `spreadsheetId: ${data.spreadSheetsId}, prompt: ${data.initialPrompt}`,
+      `spreadsheetId: ${
+        data.spreadSheetsId
+      }, assistedMode: ${data.assistedMode.toString()}, prompt: ${
+        data.initialPrompt
+      }`,
     )
 
     await SheetsApiUtils.createSheets(
@@ -70,7 +74,7 @@ export class ModelService {
 
     return {
       messages: [
-        ...getPromptsSpreadsheetCreationA(data.initialPrompt),
+        ...getPromptsSpreadsheetAssisted(data.initialPrompt),
         chatCompletion.choices[0].message,
       ],
       driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
@@ -80,19 +84,11 @@ export class ModelService {
   async updateCharts(data: Conv): Promise<SpreadSheetInfo> {
     // TODO manage multiple charts
     // TODO Ask for advice about charts instead of the pure data
-    // const res = await GptApiUtils.pursueExistingConv(
-    //   data.parentResId,
-    //   promptChartsCreation,
-    // )
-    //
-    // const chartData = GptApiUtils.extractJson<ChartData>(res.answer)
-    // if (chartData) {
-    //   await SheetsApiUtils.addCharts(data.spreadSheetsId, chartData)
-    // }
-
     return {
       messages: [],
-      driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
+      driveFileInfo: await this.sheetsService.getById(
+        data.spreadSheetsId ?? '',
+      ),
     }
   }
 }

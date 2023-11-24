@@ -20,7 +20,7 @@ const getPromptSystemSpreadsheetCreation = (
   }
 }
 
-export const getPromptsSpreadsheetCreationA = (
+export const getPromptsSpreadsheetAssisted = (
   prompt: string,
 ): ChatCompletionMessageParam[] => {
   return [
@@ -46,7 +46,7 @@ export const getPromptsSpreadsheetCreationA = (
   ]
 }
 
-export const getPromptsSpreadsheetCreationB = (
+export const getPromptsSpreadsheetInstructions = (
   prompt: string,
 ): ChatCompletionMessageParam[] => {
   return [
