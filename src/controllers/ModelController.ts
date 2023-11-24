@@ -3,15 +3,17 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 import { ModelService } from '../services/ModelService'
 import { DriveFileInfo } from './SheetsController'
 import GptApiUtils from '../utils/openai/GptApiUtils'
+import { ChatCompletionMessageParam } from 'openai/src/resources/chat/completions'
 
 export type Conv = {
   initialPrompt: string
-  spreadSheetsId: string
-  parentResId: string
+  assistedMode: boolean
+  spreadSheetsId?: string
+  messages?: ChatCompletionMessageParam[]
 }
 
 export type SpreadSheetInfo = {
-  parentResId: string
+  messages: ChatCompletionMessageParam[]
   driveFileInfo: DriveFileInfo
 }
 

@@ -4,7 +4,10 @@ import SheetsApiUtils, { SpreadsheetData } from '../utils/google/SheetsApiUtils'
 import GptApiUtils from '../utils/openai/GptApiUtils'
 import { logger } from '../utils/logging/logger'
 import { CustomError, errorOpenAi } from '../utils/errors/CustomError'
-import { getPromptsSpreadsheetCreation } from '../data/prompts'
+import {
+  getPromptsSpreadsheetCreationA,
+  getPromptsSpreadsheetCreationB,
+} from '../data/prompts'
 
 export class ModelService {
   readonly sheetsService
@@ -14,25 +17,35 @@ export class ModelService {
   }
 
   async createSpreadsheet(data: Conv): Promise<SpreadSheetInfo> {
-    const res = await GptApiUtils.startConv(
-      getPromptsSpreadsheetCreation(data.initialPrompt),
-      {
-        returnJson: true,
-      },
-    )
+    let chatCompletion
+    if (data.assistedMode) {
+      chatCompletion = await GptApiUtils.startConv(
+        getPromptsSpreadsheetCreationA(data.initialPrompt),
+        {
+          returnJson: true,
+        },
+      )
+    } else {
+      chatCompletion = await GptApiUtils.startConv(
+        getPromptsSpreadsheetCreationB(data.initialPrompt),
+        {
+          returnJson: true,
+        },
+      )
+    }
 
-    if (!res.choices[0].message.content) {
+    if (!chatCompletion.choices[0].message.content) {
       throw errorOpenAi
     }
 
     const spreadsheetData = JSON.parse(
-      res.choices[0].message.content,
+      chatCompletion.choices[0].message.content,
     ) as SpreadsheetData
 
     if (!spreadsheetData) {
       throw new CustomError(
         'ERROR_JSON',
-        `The answer does not contain a valid JSON block : ${res.choices[0].message.content}`,
+        `The answer does not contain a valid JSON block : ${chatCompletion.choices[0].message.content}`,
         'ERROR_JSON',
       )
     }
@@ -56,7 +69,10 @@ export class ModelService {
     await SheetsApiUtils.removeInitialSheet(data.spreadSheetsId)
 
     return {
-      parentResId: data.parentResId,
+      messages: [
+        ...getPromptsSpreadsheetCreationA(data.initialPrompt),
+        chatCompletion.choices[0].message,
+      ],
       driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
     }
   }
@@ -75,7 +91,7 @@ export class ModelService {
     // }
 
     return {
-      parentResId: data.parentResId,
+      messages: [],
       driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
     }
   }
