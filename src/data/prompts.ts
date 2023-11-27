@@ -27,21 +27,29 @@ export const getPromptsSpreadsheetAssisted = (
     getPromptSystemSpreadsheetCreation(prompt),
     {
       role: 'user',
-      content: `I will give you a prompt that have for goal the creation of a spreadsheet using the Sheets API.
+      content: `I will give you a prompt that contain a general idea of the content of a spreadsheet. 
+      The goal is to create a spreadsheet from this idea using the Sheets API and you will help me by providing a JSON object filled with data related to this idea.
       The prompt is : "${prompt}".
       
-      I will now give you an example of a JSON object that will serve as a baseline for the structure of the JSON object I'm expecting.
-      It is imperative for the JSON in your answer to have the same structure as my example, which means that you cannot add or remove properties but you can add as much elements as you want in array properties.
-      The values in my example are placeholder meant to be replaced, they shouldn't be present in your answer.
-      Here's the example : ${JSON.stringify(spreadsheetExample)}.
+      ${jsonInstructions}
       
       I want you to return this JSON with a content related to the prompt above. It is imperative for the language of the content to respect your role as a translator and be in the same language as the prompt. 
-      If specific instructions were given about sheets or tables, they must be respected.
+      Using the prompt, you should first try to determine if it corresponds to a spreadsheet that is commonly produced. 
+        If that's the case, then return everything we need to recreate this common spreadsheet. For example it could be about project planning, financial statements or taxes declaration.
+        If that's not the case, then try to understand what's the goal of the spreadsheet and provide not only what's related to the prompt, but also things that the author of the prompt did not think about. 
+      Your answer must be exhaustive and contain as much data as you think can be potentially useful. 
+
       Here's a quick rundown of some properties of the JSON object :
           - tables : each element of this array represent a table inside the same sheet, feel free to choose the correct number of element
           - values : the values of a table, each element of this array represent a row with the first element being the header. All elements inside a same table should have the same length.
-          - comment : intended for you to provides inputs on your answer. This is mandatory and should lengthy. 
-            It includes : if you have used formulas where they are and what they do, general information about the tables, instructions on how to adapt the sheet to similar use-cases, urls providing explanation on how to fill the data if relevant.`,
+          - comment : intended for you to provides inputs on your answer. This is mandatory, should be lengthy and formatted (with line breaks). 
+            It includes : 
+            mention of the commonly spreadsheet the user is trying to produce,
+            if you have used formulas where they are and what they do, 
+            general information about the tables, 
+            instructions on how to adapt the sheet to similar use-cases, 
+            urls providing sources of why this is an important information for the spreadsheet,
+            urls providing explanations on how to fill the data if relevant.`,
     },
   ]
 }
@@ -53,24 +61,33 @@ export const getPromptsSpreadsheetInstructions = (
     getPromptSystemSpreadsheetCreation(prompt),
     {
       role: 'user',
-      content: `I will give you a prompt that have for goal the creation of a spreadsheet using the Sheets API.
+      content: `I will give you a prompt that contain instructions that have for goal the creation of a spreadsheet using the Sheets API and you will return a JSON object.
       The prompt is : "${prompt}".
       
-      I will now give you an example of a JSON object that will serve as a baseline for the structure of the JSON object I'm expecting.
-      It is imperative for the JSON in your answer to have the same structure as my example, which means that you cannot add or remove properties but you can add as much elements as you want in array properties.
-      The values in my example are placeholder meant to be replaced, they shouldn't be present in your answer.
-      Here's the example : ${JSON.stringify(spreadsheetExample)}.
+      ${jsonInstructions}
       
       I want you to return this JSON with a content related to the prompt above. It is imperative for the language of the content to respect your role as a translator and be in the same language as the prompt. 
-      If specific instructions were given about sheets or tables, they must be respected.
+      Instructions about sheets or tables must be respected as much as possible. 
+      That means for example that if the prompt ask for a table with the months of a full year for columns, then your answer must contain all the months, not just some of them. Same for the number of rows or sheets. 
+      
       Here's a quick rundown of some properties of the JSON object :
           - tables : each element of this array represent a table inside the same sheet, feel free to choose the correct number of element
           - values : the values of a table, each element of this array represent a row with the first element being the header. All elements inside a same table should have the same length.
-          - comment : intended for you to provides inputs on your answer. This is mandatory and should lengthy. 
-            It includes : if you have used formulas where they are and what they do, general information about the tables, instructions on how to adapt the sheet to similar use-cases, urls providing explanation on how to fill the data if relevant.`,
+          - comment : intended for you to provides inputs on your answer. This is mandatory, should be lengthy and formatted (with line breaks).
+            It includes : if you have used formulas where they are and what they do, 
+            general information about the tables, 
+            instructions on how to adapt the sheet to similar use-cases, 
+            urls providing explanations on how to fill the data if relevant.`,
     },
   ]
 }
+
+const jsonInstructions = `I will now give you an example of a JSON object that will serve as a baseline for the structure of the JSON I'm expecting.
+      It is imperative for the JSON in your answer to have the same structure as my example, which means that you cannot add or remove properties but you can add as much elements as you want in array properties.
+      The values in my example are placeholder meant to be replaced, they shouldn't be present in your answer.
+      Here's the example : ${JSON.stringify(spreadsheetExample)}.
+`
+
 export const promptChartsCreation = `Now I want to add a chart to my Sheets file. 
     Your role will be to provide me with JSON objects that I will use in my functions.
     I want you to return me the a JSON object following the example but that will instead use what we've added in our Sheets file previously :
