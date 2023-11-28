@@ -1,9 +1,9 @@
 import { HttpControllerUtils } from '../utils/HttpControllerUtils'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { SpreadsheetService } from '../services/SpreadsheetService'
-import { DriveFileInfo } from './SheetsController'
 import GptApiUtils from '../utils/openai/GptApiUtils'
 import { ChatCompletionMessageParam } from 'openai/src/resources/chat/completions'
+import { DriveFileInfo } from '../services/DriveService'
 
 export type Conv = {
   initialPrompt: string
@@ -42,6 +42,7 @@ export class SpreadsheetController {
     )
   }
 
+  // TODO move this service elsewhere
   getStatus = async (req: FastifyRequest, res: FastifyReply): Promise<void> => {
     const status = await GptApiUtils.getStatus()
     await HttpControllerUtils.sendGetResponse<{ status: boolean }>(res, {

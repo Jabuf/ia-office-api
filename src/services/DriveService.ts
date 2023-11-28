@@ -1,22 +1,16 @@
-import SheetsApiUtils from '../utils/google/SheetsApiUtils'
 import DriveApiUtils from '../utils/google/DriveApiUtils'
-import { DriveFileInfo } from '../controllers/SheetsController'
 import { GaxiosError } from 'gaxios'
 import { CustomError } from '../utils/errors/CustomError'
 
-export class SheetsService {
+export type DriveFileInfo = {
+  spreadSheetsId: string
+  webContentLink: string | undefined | null
+  webViewLink: string | undefined | null
+}
+
+export class DriveService {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor() {}
-
-  async create(data: Record<string, string>): Promise<DriveFileInfo> {
-    const id = await SheetsApiUtils.createSpreadSheet(data.fileName)
-    const file = (await DriveApiUtils.retrieveFile(id)).data
-    return {
-      spreadSheetsId: id,
-      webContentLink: file.webContentLink,
-      webViewLink: file.webViewLink,
-    }
-  }
 
   async getById(id: string): Promise<DriveFileInfo> {
     try {

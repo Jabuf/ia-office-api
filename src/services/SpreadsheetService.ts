@@ -1,5 +1,5 @@
 import { Conv, SpreadSheetInfo } from '../controllers/SpreadsheetController'
-import { SheetsService } from './SheetsService'
+import { DriveService } from './DriveService'
 import SheetsApiUtils, { SpreadsheetData } from '../utils/google/SheetsApiUtils'
 import GptApiUtils from '../utils/openai/GptApiUtils'
 import { logger } from '../utils/logging/logger'
@@ -10,10 +10,10 @@ import {
 } from '../data/prompts'
 
 export class SpreadsheetService {
-  readonly sheetsService
+  readonly driveService
 
   constructor() {
-    this.sheetsService = new SheetsService()
+    this.driveService = new DriveService()
   }
 
   async createSpreadsheet(data: Conv): Promise<SpreadSheetInfo> {
@@ -77,7 +77,7 @@ export class SpreadsheetService {
         ...getPromptsSpreadsheetAssisted(data.initialPrompt),
         chatCompletion.choices[0].message,
       ],
-      driveFileInfo: await this.sheetsService.getById(data.spreadSheetsId),
+      driveFileInfo: await this.driveService.getById(data.spreadSheetsId),
     }
   }
 
@@ -86,9 +86,7 @@ export class SpreadsheetService {
     // TODO Ask for advice about charts instead of the pure data
     return {
       messages: [],
-      driveFileInfo: await this.sheetsService.getById(
-        data.spreadSheetsId ?? '',
-      ),
+      driveFileInfo: await this.driveService.getById(data.spreadSheetsId ?? ''),
     }
   }
 }

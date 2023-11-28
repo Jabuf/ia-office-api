@@ -7,9 +7,9 @@ import xXssProtection from 'x-xss-protection'
 import { logger } from './utils/logging/logger'
 import dotenv from 'dotenv'
 import { PrismaClient } from '@prisma/client'
-import sheetsRouter from './routes/sheets'
 import { ApiPrefixes } from './routes/urlConstants'
 import spreadsheetsRouter from './routes/spreadsheets'
+import documentsRouter from './routes/documents'
 
 dotenv.config()
 
@@ -42,8 +42,8 @@ export async function startServer() {
     server.use(xXssProtection())
 
     // Register the routes
+    await server.register(documentsRouter, { prefix: ApiPrefixes.V1 })
     await server.register(spreadsheetsRouter, { prefix: ApiPrefixes.V1 })
-    await server.register(sheetsRouter, { prefix: ApiPrefixes.V1 })
     logger.info(`Routes registered${server.printRoutes()}`)
 
     server.setErrorHandler((error, request, reply) => {
