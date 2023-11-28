@@ -9,7 +9,7 @@ export class SheetsService {
   constructor() {}
 
   async create(data: Record<string, string>): Promise<DriveFileInfo> {
-    const id = await SheetsApiUtils.createSpreadSheets(data.fileName)
+    const id = await SheetsApiUtils.createSpreadSheet(data.fileName)
     const file = (await DriveApiUtils.retrieveFile(id)).data
     return {
       spreadSheetsId: id,

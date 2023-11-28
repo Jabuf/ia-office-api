@@ -30,6 +30,7 @@ export default abstract class GptApiUtils {
         response_format: { type: options?.returnJson ? 'json_object' : 'text' },
       })
       const end = performance.now()
+      // TODO full logs in debug only and add costs ?
       logger.info(
         `answer size : ${JSON.stringify(chatCompletion.usage)},
       execution time: ${((end - start) / 1000).toFixed(0)}, 

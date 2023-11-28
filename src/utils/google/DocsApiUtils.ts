@@ -58,7 +58,7 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
     auth: this.client,
   })
 
-  static async createSpreadSheet(fileName: string): Promise<string> {
+  static async createSpreadSheets(fileName: string): Promise<string> {
     const spreadSheets = await this.sheets.spreadsheets.create({
       requestBody: {
         properties: {

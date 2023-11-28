@@ -50,7 +50,7 @@ export class ModelService {
       )
     }
 
-    data.spreadSheetsId = await SheetsApiUtils.createSpreadSheets(
+    data.spreadSheetsId = await SheetsApiUtils.createSpreadSheet(
       spreadsheetData.title,
     )
     logger.info(
