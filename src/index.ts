@@ -9,7 +9,7 @@ import dotenv from 'dotenv'
 import { PrismaClient } from '@prisma/client'
 import sheetsRouter from './routes/sheets'
 import { ApiPrefixes } from './routes/urlConstants'
-import modelRouter from './routes/model'
+import spreadsheetsRouter from './routes/spreadsheets'
 
 dotenv.config()
 
@@ -42,7 +42,7 @@ export async function startServer() {
     server.use(xXssProtection())
 
     // Register the routes
-    await server.register(modelRouter, { prefix: ApiPrefixes.V1 })
+    await server.register(spreadsheetsRouter, { prefix: ApiPrefixes.V1 })
     await server.register(sheetsRouter, { prefix: ApiPrefixes.V1 })
     logger.info(`Routes registered${server.printRoutes()}`)
 

@@ -1,4 +1,4 @@
-import { Conv, SpreadSheetInfo } from '../controllers/ModelController'
+import { Conv, SpreadSheetInfo } from '../controllers/SpreadsheetController'
 import { SheetsService } from './SheetsService'
 import SheetsApiUtils, { SpreadsheetData } from '../utils/google/SheetsApiUtils'
 import GptApiUtils from '../utils/openai/GptApiUtils'
@@ -9,7 +9,7 @@ import {
   getPromptsSpreadsheetInstructions,
 } from '../data/prompts'
 
-export class ModelService {
+export class SpreadsheetService {
   readonly sheetsService
 
   constructor() {

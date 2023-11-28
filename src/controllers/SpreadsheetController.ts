@@ -1,6 +1,6 @@
 import { HttpControllerUtils } from '../utils/HttpControllerUtils'
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { ModelService } from '../services/ModelService'
+import { SpreadsheetService } from '../services/SpreadsheetService'
 import { DriveFileInfo } from './SheetsController'
 import GptApiUtils from '../utils/openai/GptApiUtils'
 import { ChatCompletionMessageParam } from 'openai/src/resources/chat/completions'
@@ -17,13 +17,13 @@ export type SpreadSheetInfo = {
   driveFileInfo: DriveFileInfo
 }
 
-export class ModelController {
+export class SpreadsheetController {
   createSpreadsheet = async (
     req: FastifyRequest<{ Body: Conv }>,
     res: FastifyReply,
   ): Promise<void> => {
-    const modelService = new ModelService()
-    const spreadSheetInfo = await modelService.createSpreadsheet(req.body)
+    const spreadsheetService = new SpreadsheetService()
+    const spreadSheetInfo = await spreadsheetService.createSpreadsheet(req.body)
     await HttpControllerUtils.sendPostResponse<SpreadSheetInfo>(
       res,
       spreadSheetInfo,
@@ -34,8 +34,8 @@ export class ModelController {
     req: FastifyRequest<{ Body: Conv }>,
     res: FastifyReply,
   ): Promise<void> => {
-    const modelService = new ModelService()
-    const spreadSheetInfo = await modelService.updateCharts(req.body)
+    const spreadsheetService = new SpreadsheetService()
+    const spreadSheetInfo = await spreadsheetService.updateCharts(req.body)
     await HttpControllerUtils.sendPutResponse<SpreadSheetInfo>(
       res,
       spreadSheetInfo,
