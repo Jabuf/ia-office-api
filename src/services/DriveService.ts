@@ -3,7 +3,7 @@ import { GaxiosError } from 'gaxios'
 import { CustomError } from '../utils/errors/CustomError'
 
 export type DriveFileInfo = {
-  spreadSheetsId: string
+  fileId: string
   webContentLink: string | undefined | null
   webViewLink: string | undefined | null
 }
@@ -16,7 +16,7 @@ export class DriveService {
     try {
       const file = (await DriveApiUtils.retrieveFile(id)).data
       return {
-        spreadSheetsId: id,
+        fileId: id,
         webContentLink: file.webContentLink,
         webViewLink: file.webViewLink,
       }
