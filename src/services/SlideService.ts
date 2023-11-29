@@ -19,7 +19,7 @@ export class SlideService {
       {
         id: '12345',
         layout: 'TITLE_ONLY' as PredefinedLayout,
-        text: 'text',
+        text: data.text,
         position: 1,
       },
     ]
