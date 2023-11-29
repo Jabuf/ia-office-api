@@ -4,6 +4,10 @@ import { ChatCompletionMessageParam } from 'openai/src/resources/chat/completion
 import { DocumentService } from '../services/DocumentService'
 import { DriveFileInfo } from '../services/DriveService'
 
+export type ConvDocument = {
+  initialPrompt: string
+}
+
 export type DocumentInfo = {
   messages: ChatCompletionMessageParam[]
   driveFileInfo: DriveFileInfo
@@ -11,7 +15,7 @@ export type DocumentInfo = {
 
 export class DocumentController {
   createSpreadsheet = async (
-    req: FastifyRequest<{ Body: { text: string } }>,
+    req: FastifyRequest<{ Body: ConvDocument }>,
     res: FastifyReply,
   ): Promise<void> => {
     const documentService = new DocumentService()

@@ -20,6 +20,23 @@ const getPromptSystemSpreadsheetCreation = (
   }
 }
 
+const getPromptSystemDocumentCreation = (
+  prompt: string,
+): ChatCompletionSystemMessageParam => {
+  return {
+    role: 'system',
+    content: `${promptSystem.content ?? ''}. 
+      You will act as a writer for the creation of a text document.
+      You will also act as a translator. Indeed, if the following extract is not in english, then you must translate all your answers to this language, even if I continue to talk to you in english.
+      The extract : ${prompt.substring(0, 50)}`,
+  }
+}
+
+const jsonInstructions = `I will now give you an example of a JSON object that will serve as a baseline for the structure of the JSON I'm expecting.
+      It is imperative for the JSON in your answer to have the same structure as my example, which means that you cannot add or remove properties but you can add as much elements as you want in array properties.
+      The values in my example are placeholder meant to be replaced, they shouldn't be present in your answer.
+      Here's the example : ${JSON.stringify(spreadsheetExample)}.`
+
 export const getPromptsSpreadsheetAssisted = (
   prompt: string,
 ): ChatCompletionMessageParam[] => {
@@ -82,11 +99,18 @@ export const getPromptsSpreadsheetInstructions = (
   ]
 }
 
-const jsonInstructions = `I will now give you an example of a JSON object that will serve as a baseline for the structure of the JSON I'm expecting.
-      It is imperative for the JSON in your answer to have the same structure as my example, which means that you cannot add or remove properties but you can add as much elements as you want in array properties.
-      The values in my example are placeholder meant to be replaced, they shouldn't be present in your answer.
-      Here's the example : ${JSON.stringify(spreadsheetExample)}.
-`
+export const getPromptsDocument = (
+  prompt: string,
+): ChatCompletionMessageParam[] => {
+  return [
+    getPromptSystemDocumentCreation(prompt),
+    {
+      role: 'user',
+      content: `I will give you a prompt that contain a general idea of a text document I would like to produce. 
+      The prompt is : "${prompt}" and would I like you to return an example of what this document could look like.`,
+    },
+  ]
+}
 
 export const promptChartsCreation = `Now I want to add a chart to my Sheets file. 
     Your role will be to provide me with JSON objects that I will use in my functions.
