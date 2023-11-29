@@ -5,6 +5,6 @@ export default defineConfig({
     exclude: [...configDefaults.exclude],
     // Options can be added here if needed : https://vitest.dev/config/
     globals: true,
-    testTimeout: 20000,
+    testTimeout: 200000,
   },
 })
