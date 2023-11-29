@@ -1,7 +1,7 @@
 import { google, sheets_v4 } from 'googleapis'
 import GoogleApiUtils from './GoogleApiUtils'
 import DriveApiUtils from './DriveApiUtils'
-import { CustomError } from '../errors/CustomError'
+import { CustomError, errorGoogleApi } from '../errors/CustomError'
 import { GaxiosError } from 'gaxios'
 import ColorUtils from './ColorUtils'
 
@@ -67,16 +67,12 @@ export default abstract class SheetsApiUtils extends GoogleApiUtils {
       },
     })
 
-    // We make add permissions to the spreadsheet for everyone
-    // https://developers.google.com/drive/api/guides/ref-roles
-    await DriveApiUtils.drive.permissions.create({
-      fileId: spreadSheets.data.spreadsheetId ?? '',
-      requestBody: {
-        role: 'writer',
-        type: 'anyone',
-      },
-    })
-    return spreadSheets.data.spreadsheetId || ''
+    if (!spreadSheets.data.spreadsheetId) {
+      throw errorGoogleApi
+    }
+
+    await DriveApiUtils.addPermissions(spreadSheets.data.spreadsheetId)
+    return spreadSheets.data.spreadsheetId
   }
 
   static async createSheets(

@@ -15,4 +15,16 @@ export default abstract class DriveApiUtils extends GoogleApiUtils {
       fields: 'webContentLink, webViewLink',
     })
   }
+
+  static async addPermissions(fileId: string): Promise<void> {
+    // We add permissions to the document for everyone
+    // https://developers.google.com/drive/api/guides/ref-roles
+    await DriveApiUtils.drive.permissions.create({
+      fileId,
+      requestBody: {
+        role: 'writer',
+        type: 'anyone',
+      },
+    })
+  }
 }

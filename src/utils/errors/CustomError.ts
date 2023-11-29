@@ -19,3 +19,9 @@ export const errorOpenAi = new CustomError(
   'There was a problem while communicating with ChatGPT',
   'ERROR_OPENAI',
 )
+
+export const errorGoogleApi = new CustomError(
+  'ERROR_GOOGLE_API',
+  'There was an error while communicating with the Google API',
+  'ERROR_GOOGLE_API',
+)

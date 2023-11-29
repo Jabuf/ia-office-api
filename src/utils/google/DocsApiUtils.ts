@@ -1,6 +1,7 @@
 import { google } from 'googleapis'
 import GoogleApiUtils from './GoogleApiUtils'
 import DriveApiUtils from './DriveApiUtils'
+import { errorGoogleApi } from '../errors/CustomError'
 
 export default abstract class DocsApiUtils extends GoogleApiUtils {
   static docs = google.docs({
@@ -15,16 +16,13 @@ export default abstract class DocsApiUtils extends GoogleApiUtils {
       },
     })
 
-    // We make add permissions to the document for everyone
-    // https://developers.google.com/drive/api/guides/ref-roles
-    await DriveApiUtils.drive.permissions.create({
-      fileId: document.data.documentId ?? '',
-      requestBody: {
-        role: 'writer',
-        type: 'anyone',
-      },
-    })
-    return document.data.documentId || ''
+    // TODO improves the errors
+    if (!document.data.documentId) {
+      throw errorGoogleApi
+    }
+
+    await DriveApiUtils.addPermissions(document.data.documentId)
+    return document.data.documentId
   }
 
   static async insertText(documentId: string, text: string): Promise<void> {
