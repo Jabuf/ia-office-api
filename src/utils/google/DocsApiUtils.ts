@@ -3,6 +3,11 @@ import GoogleApiUtils from './GoogleApiUtils'
 import DriveApiUtils from './DriveApiUtils'
 import { errorGoogleApi } from '../errors/CustomError'
 
+export type DocumentData = {
+  title: string
+  formattedText: string
+}
+
 export default abstract class DocsApiUtils extends GoogleApiUtils {
   static docs = google.docs({
     version: 'v1',

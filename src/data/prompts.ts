@@ -1,4 +1,4 @@
-import { chartExample, spreadsheetExample } from './examples'
+import { chartExample, documentExample, spreadsheetExample } from './examples'
 import { ChatCompletionMessageParam } from 'openai/src/resources/chat/completions'
 import OpenAI from 'openai'
 import ChatCompletionSystemMessageParam = OpenAI.ChatCompletionSystemMessageParam
@@ -26,16 +26,18 @@ const getPromptSystemDocumentCreation = (
   return {
     role: 'system',
     content: `${promptSystem.content ?? ''}. 
-      You will act as a writer for the creation of a text document.
+      You will act as a writer for the creation of a text document and will output JSON.
       You will also act as a translator. Indeed, if the following extract is not in english, then you must translate all your answers to this language, even if I continue to talk to you in english.
       The extract : ${prompt.substring(0, 50)}`,
   }
 }
 
-const jsonInstructions = `I will now give you an example of a JSON object that will serve as a baseline for the structure of the JSON I'm expecting.
+const getJsonInstructions = (jsonExample: Record<string, unknown>): string => {
+  return `I will now give you an example of a JSON object that will serve as a baseline for the structure of the JSON I'm expecting.
       It is imperative for the JSON in your answer to have the same structure as my example, which means that you cannot add or remove properties but you can add as much elements as you want in array properties.
       The values in my example are placeholder meant to be replaced, they shouldn't be present in your answer.
-      Here's the example : ${JSON.stringify(spreadsheetExample)}.`
+      Here's the example : ${JSON.stringify(jsonExample)}.`
+}
 
 export const getPromptsSpreadsheetAssisted = (
   prompt: string,
@@ -48,7 +50,7 @@ export const getPromptsSpreadsheetAssisted = (
       The goal is to create a spreadsheet from this idea using the Sheets API and you will help me by providing a JSON object filled with data related to this idea.
       The prompt is : "${prompt}".
       
-      ${jsonInstructions}
+      ${getJsonInstructions(spreadsheetExample)}
       
       I want you to return this JSON with a content related to the prompt above. It is imperative for the language of the content to respect your role as a translator and be in the same language as the prompt. 
       Using the prompt, you should first try to determine if it corresponds to a spreadsheet that is commonly produced. 
@@ -81,7 +83,7 @@ export const getPromptsSpreadsheetInstructions = (
       content: `I will give you a prompt that contain instructions that have for goal the creation of a spreadsheet using the Sheets API and you will return a JSON object.
       The prompt is : "${prompt}".
       
-      ${jsonInstructions}
+      ${getJsonInstructions(spreadsheetExample)}
       
       I want you to return this JSON with a content related to the prompt above. It is imperative for the language of the content to respect your role as a translator and be in the same language as the prompt. 
       Instructions about sheets or tables must be respected as much as possible. 
@@ -106,8 +108,11 @@ export const getPromptsDocument = (
     getPromptSystemDocumentCreation(prompt),
     {
       role: 'user',
-      content: `I will give you a prompt that contain a general idea of a text document I would like to produce. 
-      The prompt is : "${prompt}" and would I like you to return an example of what this document could look like.`,
+      content: `I will give you a prompt that contain a general idea of a text document I would like to produce and you will return a JSON object.
+      The prompt is : "${prompt}" and would I like you to return an example of what this document could look like.
+      
+      ${getJsonInstructions(documentExample)}
+      `,
     },
   ]
 }
