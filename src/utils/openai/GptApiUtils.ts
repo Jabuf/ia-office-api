@@ -35,7 +35,7 @@ export default abstract class GptApiUtils {
         `answer size : ${JSON.stringify(chatCompletion.usage)},
       execution time: ${((end - start) / 1000).toFixed(0)}, 
       answer: ${JSON.stringify(chatCompletion.choices[0].message)},
-      prompt: ${JSON.stringify(messages)}`,
+      prompt: ${JSON.stringify(messages).substring(0, 500)}`,
       )
       return chatCompletion
     } catch (err) {
