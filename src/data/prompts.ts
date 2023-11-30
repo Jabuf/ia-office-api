@@ -109,10 +109,16 @@ export const getPromptsDocument = (
     {
       role: 'user',
       content: `I will give you a prompt that contain a general idea of a text document I would like to produce and you will return a JSON object.
-      The prompt is : "${prompt}" and would I like you to return an example of what this document could look like.
+      The prompt is : "${prompt}" and would I like you to return a exhaustive and lengthy example of what this document could look like. 
+      The language of your answer must respect your role as a translator.
       
       ${getJsonInstructions(documentExample)}
-      `,
+      
+      Here's a quick rundown of some properties of the JSON object :
+        - content : an array of paragraphs separated with titles, if you consider that there's no need for such a separation (for example in a letter), then this array should only include one element
+        - sectionName : an optional property for the title of a paragraph, if there's only one element in the content array, then usually you'll leave this empty
+        - text: formatted text
+`,
     },
   ]
 }

@@ -77,7 +77,11 @@ export const chartExample: ChartData = {
 
 export const documentExample: DocumentData = {
   title: 'Notice of Lease Termination',
-  formattedText: `[Your Name]
+  content: [
+    {
+      order:0,
+      sectionName: '',
+      text: `[Your Name]
     [Your Address]
     [City, State, ZIP Code]
     [Email Address]
@@ -110,4 +114,6 @@ export const documentExample: DocumentData = {
     Sincerely,
     
     [Your Full Name]`,
+    },
+  ],
 }

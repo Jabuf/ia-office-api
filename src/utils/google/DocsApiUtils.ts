@@ -5,7 +5,13 @@ import { errorGoogleApi } from '../errors/CustomError'
 
 export type DocumentData = {
   title: string
-  formattedText: string
+  content: ParagraphData[]
+}
+
+type ParagraphData = {
+  order: number
+  sectionName?: string
+  text: string
 }
 
 export default abstract class DocsApiUtils extends GoogleApiUtils {
@@ -30,14 +36,68 @@ export default abstract class DocsApiUtils extends GoogleApiUtils {
     return document.data.documentId
   }
 
-  static async insertText(documentId: string, text: string): Promise<void> {
+  static async insertParagraphs(
+    documentId: string,
+    paragraphs: ParagraphData[],
+  ): Promise<void> {
+    const sortedParagraphs = paragraphs.sort((a, b) => a.order - b.order)
+    let endIndex = 1
+    for (const paragraph of sortedParagraphs) {
+      await Promise.resolve(
+        this.insertParagraph(documentId, paragraph, endIndex),
+      )
+      endIndex +=
+        (paragraph.sectionName ? paragraph.sectionName.length + 2 : 0) +
+        paragraph.text.length +
+        2
+    }
+  }
+
+  static async insertParagraph(
+    documentId: string,
+    paragraph: ParagraphData,
+    previousIndex = 1,
+  ): Promise<void> {
+    if (paragraph.sectionName) {
+      await this.docs.documents.batchUpdate({
+        documentId,
+        requestBody: {
+          requests: [
+            {
+              insertText: {
+                text: `${paragraph.sectionName}\n\n`,
+                endOfSegmentLocation: {
+                  segmentId: '',
+                },
+              },
+            },
+            {
+              updateTextStyle: {
+                textStyle: {
+                  bold: true,
+                  fontSize: {
+                    magnitude: 14,
+                    unit: 'PT',
+                  },
+                },
+                range: {
+                  startIndex: previousIndex,
+                  endIndex: previousIndex + paragraph.sectionName.length + 2,
+                },
+                fields: 'bold,fontSize,foregroundColor',
+              },
+            },
+          ],
+        },
+      })
+    }
     await this.docs.documents.batchUpdate({
       documentId,
       requestBody: {
         requests: [
           {
             insertText: {
-              text,
+              text: `${paragraph.text}\n\n`,
               endOfSegmentLocation: {
                 segmentId: '',
               },

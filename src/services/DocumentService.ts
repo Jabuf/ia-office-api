@@ -29,7 +29,7 @@ export class DocumentService {
     ) as DocumentData
 
     const documentId = await DocsApiUtils.createDocument(documentData.title)
-    await DocsApiUtils.insertText(documentId, documentData.formattedText)
+    await DocsApiUtils.insertParagraphs(documentId, documentData.content)
     return {
       messages: [
         ...getPromptsDocument(data.initialPrompt),
