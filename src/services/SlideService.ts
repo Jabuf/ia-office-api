@@ -26,7 +26,7 @@ export class SlideService {
     await SlidesApiUtils.insertSlides(slideId, slidesPlaceholder)
     return {
       messages: [],
-      driveFileInfo: await this.driveService.getById(slideId),
+      driveFileInfo: await this.driveService.getFileById(slideId),
     }
   }
 }

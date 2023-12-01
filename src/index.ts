@@ -1,16 +1,17 @@
-import 'regenerator-runtime/runtime.js'
-import fastify from 'fastify'
-import helmet from '@fastify/helmet'
 import cors from '@fastify/cors'
+import helmet from '@fastify/helmet'
 import middleware from '@fastify/middie'
-import xXssProtection from 'x-xss-protection'
-import { logger } from './utils/logging/logger'
-import dotenv from 'dotenv'
 import { PrismaClient } from '@prisma/client'
-import { ApiPrefixes } from './routes/urlConstants'
-import spreadsheetsRouter from './routes/spreadsheets'
+import dotenv from 'dotenv'
+import fastify from 'fastify'
+import 'regenerator-runtime/runtime.js'
+import xXssProtection from 'x-xss-protection'
 import documentsRouter from './routes/documents'
+import filesRouter from './routes/files'
 import slidesRouter from './routes/slides'
+import spreadsheetsRouter from './routes/spreadsheets'
+import { ApiPrefixes } from './routes/urlConstants'
+import { logger } from './utils/logging/logger'
 
 dotenv.config()
 
@@ -44,6 +45,7 @@ export async function startServer() {
 
     // Register the routes
     await server.register(documentsRouter, { prefix: ApiPrefixes.V1 })
+    await server.register(filesRouter, { prefix: ApiPrefixes.V1 })
     await server.register(spreadsheetsRouter, { prefix: ApiPrefixes.V1 })
     await server.register(slidesRouter, { prefix: ApiPrefixes.V1 })
     logger.info(`Routes registered${server.printRoutes()}`)

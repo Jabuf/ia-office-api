@@ -35,7 +35,7 @@ export class DocumentService {
         ...getPromptsDocument(data.initialPrompt),
         chatCompletion.choices[0].message,
       ],
-      driveFileInfo: await this.driveService.getById(documentId),
+      driveFileInfo: await this.driveService.getFileById(documentId),
     }
   }
 }

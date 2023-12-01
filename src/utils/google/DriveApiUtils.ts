@@ -1,6 +1,5 @@
 import { drive_v3, google } from 'googleapis'
 import GoogleApiUtils from './GoogleApiUtils'
-import { GaxiosPromise } from 'googleapis-common'
 import Schema$File = drive_v3.Schema$File
 
 export default abstract class DriveApiUtils extends GoogleApiUtils {
@@ -9,11 +8,17 @@ export default abstract class DriveApiUtils extends GoogleApiUtils {
     auth: this.client,
   })
 
-  static async retrieveFile(id: string): Promise<GaxiosPromise<Schema$File>> {
-    return this.drive.files.get({
-      fileId: id,
-      fields: 'webContentLink, webViewLink',
-    })
+  static async getFileById(id: string): Promise<Schema$File> {
+    return (
+      await this.drive.files.get({
+        fileId: id,
+        fields: 'webContentLink, webViewLink',
+      })
+    ).data
+  }
+
+  static async getFiles(): Promise<Schema$File[]> {
+    return (await DriveApiUtils.drive.files.list()).data.files ?? []
   }
 
   static async addPermissions(fileId: string): Promise<void> {

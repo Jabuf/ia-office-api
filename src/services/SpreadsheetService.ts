@@ -77,7 +77,7 @@ export class SpreadsheetService {
         ...getPromptsSpreadsheetAssisted(data.initialPrompt),
         chatCompletion.choices[0].message,
       ],
-      driveFileInfo: await this.driveService.getById(data.spreadSheetsId),
+      driveFileInfo: await this.driveService.getFileById(data.spreadSheetsId),
     }
   }
 
@@ -86,7 +86,7 @@ export class SpreadsheetService {
     // TODO Ask for advice about charts instead of the pure data
     return {
       messages: [],
-      driveFileInfo: await this.driveService.getById(data.spreadSheetsId ?? ''),
+      driveFileInfo: await this.driveService.getFileById(data.spreadSheetsId ?? ''),
     }
   }
 }
