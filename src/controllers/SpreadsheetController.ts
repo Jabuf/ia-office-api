@@ -1,9 +1,9 @@
-import { HttpControllerUtils } from '../utils/HttpControllerUtils'
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { SpreadsheetService } from '../services/SpreadsheetService'
-import GptApiUtils from '../utils/openai/GptApiUtils'
 import { ChatCompletionMessageParam } from 'openai/src/resources/chat/completions'
-import { DriveFileInfo } from '../services/DriveService'
+import { DriveFileInfo } from '../services/FileService'
+import { SpreadsheetService } from '../services/SpreadsheetService'
+import { HttpControllerUtils } from '../utils/HttpControllerUtils'
+import GptApiUtils from '../utils/openai/GptApiUtils'
 
 export type Conv = {
   initialPrompt: string

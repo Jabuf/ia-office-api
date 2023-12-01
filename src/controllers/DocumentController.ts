@@ -1,8 +1,8 @@
-import { HttpControllerUtils } from '../utils/HttpControllerUtils'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { ChatCompletionMessageParam } from 'openai/src/resources/chat/completions'
 import { DocumentService } from '../services/DocumentService'
-import { DriveFileInfo } from '../services/DriveService'
+import { DriveFileInfo } from '../services/FileService'
+import { HttpControllerUtils } from '../utils/HttpControllerUtils'
 
 export type ConvDocument = {
   initialPrompt: string

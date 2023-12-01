@@ -1,9 +1,9 @@
 import { ConvDocument, DocumentInfo } from '../controllers/DocumentController'
-import DocsApiUtils, { DocumentData } from '../utils/google/DocsApiUtils'
-import { DriveService } from './DriveService'
-import GptApiUtils from '../utils/openai/GptApiUtils'
 import { getPromptsDocument } from '../data/prompts'
 import { errorOpenAi } from '../utils/errors/CustomError'
+import DocsApiUtils, { DocumentData } from '../utils/google/DocsApiUtils'
+import GptApiUtils from '../utils/openai/GptApiUtils'
+import { DriveService } from './FileService'
 
 export class DocumentService {
   readonly driveService

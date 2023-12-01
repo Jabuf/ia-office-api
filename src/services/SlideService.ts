@@ -1,8 +1,8 @@
-import { DriveService } from './DriveService'
 import { SlideInfo } from '../controllers/SlideController'
 import SlidesApiUtils, {
   PredefinedLayout,
 } from '../utils/google/SlidesApiUtils'
+import { DriveService } from './FileService'
 
 export class SlideService {
   readonly driveService
