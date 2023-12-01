@@ -18,7 +18,16 @@ export default abstract class DriveApiUtils extends GoogleApiUtils {
   }
 
   static async getFiles(): Promise<Schema$File[]> {
-    return (await DriveApiUtils.drive.files.list()).data.files ?? []
+    return (
+      // https://developers.google.com/drive/api/guides/fields-parameter
+      (
+        await DriveApiUtils.drive.files.list({
+          fields:
+            'files(id, createdTime, name, mimeType, webContentLink, webViewLink)',
+          q: 'trashed=false',
+        })
+      ).data.files ?? []
+    )
   }
 
   static async addPermissions(fileId: string): Promise<void> {
