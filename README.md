@@ -4,7 +4,7 @@
 
 IA Office is an API that allow the generation of office files (docs, sheets, and slides) from a simple prompt. This versatile tool enables users to create a wide range of office documents effortlessly.
 
-**Disclaimer:** This project is currently in its early development phases and is subject to major changes, including potential removal or renaming of endpoints.
+**Disclaimer:** This project is still early in the development phase and is subject to major changes, including potential removal or renaming of endpoints.
 
 ## Features
 
@@ -32,6 +32,13 @@ IA Office is an API that allow the generation of office files (docs, sheets, and
    npm run dev
    ```
 
+## Roadmap
+- [x] Add Docs generation
+- [ ] Dissociate Docs generation into mutliple templates
+- [ ] Split Sheets generation into multiple LLM interactions
+- [ ] Implement Slides generation
+- [ ] Rework charts generation
+
 ## Contributing
 
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement" or "bug". Don't forget to give the project a star! Thanks again!
@@ -47,3 +54,7 @@ For major changes, please open an issue first to discuss the proposed changes an
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+## Contact
+
+[github](https://github.com/Jabuf) - [mail](jason.buffet.pro@gmail.com)
