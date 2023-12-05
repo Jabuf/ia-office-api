@@ -53,7 +53,7 @@ export class SpreadsheetService {
     data.spreadSheetsId = await SheetsApiUtils.createSpreadSheet(
       spreadsheetData.title,
     )
-    logger.info(
+    logger.debug(
       `spreadsheetId: ${
         data.spreadSheetsId
       }, assistedMode: ${data.assistedMode.toString()}, prompt: ${

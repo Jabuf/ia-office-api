@@ -1,10 +1,10 @@
 import dotenv from 'dotenv'
-import { logger } from '../logging/logger'
-import { CustomError } from '../errors/CustomError'
 import { OpenAI } from 'openai'
+import { OpenAIError } from 'openai/error'
 import { ChatCompletion } from 'openai/resources'
 import { ChatCompletionMessageParam } from 'openai/src/resources/chat/completions'
-import { OpenAIError } from 'openai/error'
+import { CustomError } from '../errors/CustomError'
+import { logger } from '../logging/logger'
 
 dotenv.config()
 
@@ -25,13 +25,14 @@ export default abstract class GptApiUtils {
       // Chat completion documentation : https://platform.openai.com/docs/api-reference/chat/create
       const start = performance.now()
       const chatCompletion = await this.openai.chat.completions.create({
+        temperature: 0.6,
         messages: [...(options?.previousMessages ?? []), ...messages],
         model: this.defaultModel,
         response_format: { type: options?.returnJson ? 'json_object' : 'text' },
       })
       const end = performance.now()
       // TODO full logs in debug only and add costs ?
-      logger.info(
+      logger.debug(
         `answer size : ${JSON.stringify(chatCompletion.usage)},
       execution time: ${((end - start) / 1000).toFixed(0)}, 
       answer: ${JSON.stringify(chatCompletion.choices[0].message)},
