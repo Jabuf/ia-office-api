@@ -1,5 +1,5 @@
-import { ChartData, SpreadsheetData } from '../utils/google/SheetsApiUtils'
 import { DocumentData } from '../utils/google/DocsApiUtils'
+import { ChartData, SpreadsheetData } from '../utils/google/SheetsApiUtils'
 
 export const spreadsheetExample: SpreadsheetData = {
   title: 'My spreadsheet title',
@@ -9,29 +9,24 @@ export const spreadsheetExample: SpreadsheetData = {
       tables: [
         {
           values: [
-            ['Product', 'Month', 'Vendor', 'Amount'],
-            ['Cheese', 'January', 'John', '150'],
-            ['Cheese', 'February', 'John', '50'],
-            ['Milk', 'January', 'John', '200'],
-            ['Lamb', 'March', 'John', '15'],
-            ['Cheese', 'February', 'Robert', '25'],
-            ['Milk', 'January', 'Robert', '50'],
-            ['Milk', 'February', 'Robert', '100'],
-            ['Milk', 'March', 'Robert', '100'],
+            ['Pokemon', 'Encounter', 'Shiny'],
+            ['Magikarp', '250', '2'],
+            ['Roucool', '137', '0'],
+            ['Magmar', '208', '1'],
+            ['Canarticho', '853', '2'],
           ],
         },
       ],
-      comment: 'Here you can find some useful comments about this sheet.',
+      comment: `Here you can find some useful comments about this sheet.
+      My comment should be spread on multiple lines if it's too long.`,
     },
     {
       name: 'MySheet2',
       tables: [
         {
           values: [
-            ['Name', 'Total Sales (€)'],
-            ['John', "=SUM(FILTER('MySheet1'!D2:D9,A2='MySheet1'!C2:C9))"],
-            ['Robert', "=SUM(FILTER('MySheet1'!D2:D9,A3='MySheet1'!C2:C9))"],
-            ['Total', '=SUM(B2:B3)'],
+            ['Encounter', 'Shiny', 'Percentage'],
+            ["=SUM('MySheet1'!B2:B5)", "=SUM('MySheet1'!C2:C5)", "=DIVIDE(B2,A2)"],
           ],
         },
       ],
