@@ -28,7 +28,7 @@ export default abstract class PromptSpreadsheetUtils extends PromptUtils {
         content: `I will give you a prompt that contain a general idea for a spreadsheet and want you to act as my advisor.
       Your role will be to provide me with an exhaustive list of what I could put in that spreadsheet.
       You will also act as a translator. Indeed, if the prompt is not in english, then your answer must be in this language, even if I continue to talk to you in english.
-      You must start your answer by explicitly indicate the language that should be used in the file.
+      You must start your answer by explicitly indicate the language that should be used in the file, like 'Ce fichier doit être en français'.
       The prompt is : "${prompt}"
       
       A good approach would be to first try to determine if it corresponds to a spreadsheet that is commonly produced.
@@ -47,7 +47,8 @@ export default abstract class PromptSpreadsheetUtils extends PromptUtils {
       {
         role: 'user',
         content: `Following the suggestions you provided me earlier, I now want you to build a JSON object that will contain all these suggestions.
-        It is imperative for the language of the content of the JSON to respect your role as a translator and be in the same language as the initial prompt.
+        It is imperative for your answer to respect your role as a translator and be in the language indicated in our prior exchange. 
+        The content of your answer shouldn't be in english unless explicitly stated.
       
       ${this.getJsonInstructions(spreadsheetExample)}
       
