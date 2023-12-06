@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import OpenAI from 'openai'
 import PromptUtils from './PromptUtils'
 import { ChatCompletionMessageParam } from 'openai/src/resources/chat/completions'
-import { documentExample } from './examples'
+import { DocumentData } from '../google/DocsApiUtils'
 import ChatCompletionSystemMessageParam = OpenAI.ChatCompletionSystemMessageParam
 
 dotenv.config()
@@ -20,22 +20,20 @@ export default abstract class PromptDocumentUtils extends PromptUtils {
     }
   }
 
-  static getJsonCreation = (prompt: string): ChatCompletionMessageParam[] => {
+  static getJsonCreation = (
+    prompt: string,
+    example: DocumentData,
+  ): ChatCompletionMessageParam[] => {
     return [
       this.getSystemCreation(prompt),
       {
         role: 'user',
         content: `I will give you a prompt that contain a general idea of a text document I would like to produce and you will return a JSON object.
       The prompt is : "${prompt}" and would I like you to return a exhaustive and lengthy example of what this document could look like. 
-      The language of your answer must respect your role as a translator.
+      You will also act as a translator. Indeed, if the prompt is not in english, then your answer must be in this language, even if I continue to talk to you in english.
+      The content of your answer shouldn't be in english unless it is the language used in the prompt I gave you.
       
-      ${this.getJsonInstructions(documentExample)}
-      
-      Here's a quick rundown of some properties of the JSON object :
-        - content : an array of paragraphs separated with titles, if you consider that there's no need for such a separation (for example in a letter), then this array should only include one element
-        - sectionName : an optional property for the title of a paragraph, if there's only one element in the content array, then usually you'll leave this empty
-        - text: formatted text
-`,
+      ${this.getJsonInstructions(example)}`,
       },
     ]
   }

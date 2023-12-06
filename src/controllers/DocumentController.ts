@@ -6,6 +6,7 @@ import { HttpControllerUtils } from '../utils/HttpControllerUtils'
 
 export type ConvDocument = {
   initialPrompt: string
+  documentType: 'letter' | 'mail' | 'block' | 'presentation'
 }
 
 export type DocumentInfo = {
