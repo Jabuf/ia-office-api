@@ -1,5 +1,5 @@
-import { DocumentData } from '../utils/google/DocsApiUtils'
-import { ChartData, SpreadsheetData } from '../utils/google/SheetsApiUtils'
+import { ChartData, SpreadsheetData } from '../google/SheetsApiUtils'
+import { DocumentData } from '../google/DocsApiUtils'
 
 export const spreadsheetExample: SpreadsheetData = {
   title: 'My spreadsheet title',
@@ -26,7 +26,11 @@ export const spreadsheetExample: SpreadsheetData = {
         {
           values: [
             ['Encounter', 'Shiny', 'Percentage'],
-            ["=SUM('MySheet1'!B2:B5)", "=SUM('MySheet1'!C2:C5)", "=DIVIDE(B2,A2)"],
+            [
+              "=SUM('MySheet1'!B2:B5)",
+              "=SUM('MySheet1'!C2:C5)",
+              '=DIVIDE(B2,A2)',
+            ],
           ],
         },
       ],
@@ -74,7 +78,7 @@ export const documentExample: DocumentData = {
   title: 'Notice of Lease Termination',
   content: [
     {
-      order:0,
+      order: 0,
       sectionName: '',
       text: `[Your Name]
     [Your Address]

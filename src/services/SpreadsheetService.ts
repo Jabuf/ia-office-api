@@ -1,13 +1,10 @@
 import { Conv, SpreadSheetInfo } from '../controllers/SpreadsheetController'
-import {
-  getPromptsSpreadsheetAssisted,
-  getPromptsSpreadsheetInstructions,
-} from '../data/prompts'
 import { CustomError, errorOpenAi } from '../utils/errors/CustomError'
 import SheetsApiUtils, { SpreadsheetData } from '../utils/google/SheetsApiUtils'
 import { logger } from '../utils/logging/logger'
 import GptApiUtils from '../utils/openai/GptApiUtils'
 import { DriveService } from './FileService'
+import PromptSpreadsheetUtils from '../utils/openai/PromptSpreadsheetUtils'
 
 export class SpreadsheetService {
   readonly driveService
@@ -20,14 +17,22 @@ export class SpreadsheetService {
     let chatCompletion
     if (data.assistedMode) {
       chatCompletion = await GptApiUtils.startConv(
-        getPromptsSpreadsheetAssisted(data.initialPrompt),
+        PromptSpreadsheetUtils.getSuggestions(data.initialPrompt),
+      )
+      chatCompletion = await GptApiUtils.startConv(
+        [
+          chatCompletion.choices[0].message,
+          ...PromptSpreadsheetUtils.getJsonCreationFromSuggestions(
+            data.initialPrompt,
+          ),
+        ],
         {
           returnJson: true,
         },
       )
     } else {
       chatCompletion = await GptApiUtils.startConv(
-        getPromptsSpreadsheetInstructions(data.initialPrompt),
+        PromptSpreadsheetUtils.getJsonCreationFromPrompt(data.initialPrompt),
         {
           returnJson: true,
         },
@@ -73,10 +78,7 @@ export class SpreadsheetService {
     await SheetsApiUtils.removeInitialSheet(data.spreadSheetsId)
 
     return {
-      messages: [
-        ...getPromptsSpreadsheetAssisted(data.initialPrompt),
-        chatCompletion.choices[0].message,
-      ],
+      messages: [chatCompletion.choices[0].message],
       driveFileInfo: await this.driveService.getFileById(data.spreadSheetsId),
     }
   }
@@ -86,7 +88,9 @@ export class SpreadsheetService {
     // TODO Ask for advice about charts instead of the pure data
     return {
       messages: [],
-      driveFileInfo: await this.driveService.getFileById(data.spreadSheetsId ?? ''),
+      driveFileInfo: await this.driveService.getFileById(
+        data.spreadSheetsId ?? '',
+      ),
     }
   }
 }
