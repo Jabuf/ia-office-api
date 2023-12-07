@@ -5,7 +5,6 @@ import GptApiUtils from '../utils/openai/GptApiUtils'
 import { DriveService } from './FileService'
 import PromptDocumentUtils from '../utils/openai/PromptDocumentUtils'
 import { documentExamples, letterExample } from '../utils/openai/examples'
-import { logger } from '../utils/logging/logger'
 
 export class DocumentService {
   readonly driveService
@@ -18,7 +17,6 @@ export class DocumentService {
     const example: DocumentData =
       documentExamples[data.documentType] || letterExample
 
-    logger.info(example)
     const chatCompletion = await GptApiUtils.startConv(
       PromptDocumentUtils.getJsonCreation(data.initialPrompt, example),
       {
