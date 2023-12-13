@@ -8,11 +8,18 @@ import { logger } from '../logging/logger'
 
 dotenv.config()
 
+logger.debug(
+  `LLM used : ${
+    process.env.OPENAI_DEFAULT_MODEL
+      ? process.env.OPENAI_DEFAULT_MODEL.toString()
+      : 'UNDEFINED'
+  }`,
+)
 export default abstract class GptApiUtils {
-  // use default env values
+  // use default env values, see: https://platform.openai.com/docs/api-reference/introduction
   static openai = new OpenAI()
-  // Available models here : https://platform.openai.com/docs/models/
-  static defaultModel = 'gpt-3.5-turbo-1106'
+  // Available models here: https://platform.openai.com/docs/models/
+  static defaultModel = process.env.OPENAI_DEFAULT_MODEL ?? 'gpt-3.5-turbo'
 
   static async startConv(
     messages: ChatCompletionMessageParam[],
