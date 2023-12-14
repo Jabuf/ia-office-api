@@ -1,0 +1,63 @@
+name: GitHub Actions Deploy to App Engine
+run-name: Deploying ${{ github.ref_name }} of ${{ github.repository }} on App Engine 🚀
+on: [ push ]
+env:
+  COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+
+jobs:
+
+  # Build the application and run the tests
+  build_and_test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event from ${{ github.actor }}."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref_name }} and your repository is ${{ github.repository }}."
+
+      - name: Checking out the repository
+        uses: actions/checkout@v4
+
+      - name: Setting up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm run test --if-present
+      - run: echo "This job's status is ${{ job.status }}."
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  # Deploy the application to App Engine
+  deploy_to_app_engine:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ job.status }}
+    if: ${{ github.ref_name == 'main' || github.ref_name == 'staging' || github.ref_name == 'dev' }}
+    needs: build_and_test
+    steps:
+    # https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions
+    # https://github.com/marketplace/actions/authenticate-to-google-cloud
+    - name: Authenticate the action
+      uses: 'google-github-actions/auth@v2'
+      with:
+        workload_identity_provider: 'appspot'
+        service_account: 'concrete-flare-404411@appspot.gserviceaccount.com'
+        build_env_vars: |-
+          NODE_ENV=${{ github.ref_name == 'main' && 'production' ||  'test' }}
+
+    # https://github.com/marketplace/actions/deploy-to-app-engine
+    - name: Deploy to App Engine
+      uses: 'google-github-actions/deploy-appengine@v2'
+
+    - run: echo "This job's status is ${{ job.status }}."

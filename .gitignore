@@ -112,13 +112,6 @@ dist
 .idea/inspectionProfiles/
 .idea/sonarlint
 
-# Vue build output
-.output
-
-# Stoplight config
-
-.stoplight
-
 ### macOS ###
 # General
 .DS_Store
@@ -158,3 +151,6 @@ Temporary Items
 .idea/codeStyles/Project.xml
 
 test/blank.test.ts
+
+# Ignore generated credentials from google-github-actions/auth
+gha-creds-*.json
