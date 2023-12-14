@@ -55,7 +55,6 @@ jobs:
         name: Authenticate the action
         uses: 'google-github-actions/auth@v2'
         with:
-          workload_identity_provider: 'appspot'
           credentials_json: ${{ secrets.GOOGLE_JSON_KEY }}
           service_account: 'concrete-flare-404411@appspot.gserviceaccount.com'
           env_vars: |-
