@@ -46,18 +46,20 @@ jobs:
     if: ${{ github.ref_name == 'main' || github.ref_name == 'staging' || github.ref_name == 'dev' }}
     needs: build_and_test
     steps:
-    # https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions
-    # https://github.com/marketplace/actions/authenticate-to-google-cloud
-    - name: Authenticate the action
-      uses: 'google-github-actions/auth@v2'
-      with:
-        workload_identity_provider: 'appspot'
-        service_account: 'concrete-flare-404411@appspot.gserviceaccount.com'
-        build_env_vars: |-
-          NODE_ENV=${{ github.ref_name == 'main' && 'production' ||  'test' }}
+      - name: Checking out the repository
+        uses: actions/checkout@v4
+      # https://cloud.google.com/blog/products/identity-security/enabling-keyless-authentication-from-github-actions
+      # https://github.com/marketplace/actions/authenticate-to-google-cloud
+      - name: Authenticate the action
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: 'appspot'
+          service_account: 'concrete-flare-404411@appspot.gserviceaccount.com'
+          build_env_vars: |-
+            NODE_ENV=${{ github.ref_name == 'main' && 'production' ||  'test' }}
 
-    # https://github.com/marketplace/actions/deploy-to-app-engine
-    - name: Deploy to App Engine
-      uses: 'google-github-actions/deploy-appengine@v2'
+      # https://github.com/marketplace/actions/deploy-to-app-engine
+      - name: Deploy to App Engine
+        uses: 'google-github-actions/deploy-appengine@v2'
 
-    - run: echo "This job's status is ${{ job.status }}."
+      - run: echo "This job's status is ${{ job.status }}."
