@@ -4,10 +4,14 @@ import SlidesApiUtils from '../src/utils/google/SlidesApiUtils'
 import DriveApiUtils from '../src/utils/google/DriveApiUtils'
 import { GaxiosError } from 'gaxios'
 import { afterAll } from 'vitest'
+import { logger } from '../src/utils/logging/logger'
 
 const ids: string[] = []
 describe('google api', () => {
   it('createDocument', async () => {
+    logger.info(process.env.GOOGLE_CLIENT_EMAIL)
+    logger.info(process.env.GOOGLE_PRIVATE_KEY?.length)
+    logger.info(process.env.GOOGLE_PRIVATE_KEY?.substring(0, 40))
     const id = await DocsApiUtils.createDocument('test docs')
     ids.push(id)
     expect(id).not.toBeNull()
