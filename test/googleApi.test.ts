@@ -3,6 +3,7 @@ import SheetsApiUtils from '../src/utils/google/SheetsApiUtils'
 import SlidesApiUtils from '../src/utils/google/SlidesApiUtils'
 import DriveApiUtils from '../src/utils/google/DriveApiUtils'
 import { GaxiosError } from 'gaxios'
+import { afterAll } from 'vitest'
 
 const ids: string[] = []
 describe('google api', () => {
@@ -21,19 +22,21 @@ describe('google api', () => {
     ids.push(id)
     expect(id).not.toBeNull()
   })
-  it('delete', async () => {
-    expect(ids.length).toBe(3)
-    await Promise.all(
-      ids.map(async (id) => {
-        await DriveApiUtils.drive.files.delete({ fileId: id })
-      }),
-    )
-    try {
-      await DriveApiUtils.getFileById(ids[0])
-    } catch (err) {
-      if (err instanceof GaxiosError) {
-        expect(err.code).toBe(404)
+  it('delete', () => {
+    afterAll(async () => {
+      expect(ids.length).toBe(3)
+      await Promise.all(
+        ids.map(async (id) => {
+          await DriveApiUtils.drive.files.delete({ fileId: id })
+        }),
+      )
+      try {
+        await DriveApiUtils.getFileById(ids[0])
+      } catch (err) {
+        if (err instanceof GaxiosError) {
+          expect(err.code).toBe(404)
+        }
       }
-    }
+    })
   })
 })
