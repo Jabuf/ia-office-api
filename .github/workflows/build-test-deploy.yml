@@ -3,7 +3,7 @@ run-name: Deploying ${{ github.ref_name }} of ${{ github.repository }} on App En
 on: [ push ]
 env:
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  GOOGLE_CLIENT_EMAIL: ${{ env.GOOGLE_CLIENT_EMAIL }}
+  GOOGLE_CLIENT_EMAIL: ${{ vars.GOOGLE_CLIENT_EMAIL }}
   GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
 
 jobs:
