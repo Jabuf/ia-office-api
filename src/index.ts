@@ -70,10 +70,13 @@ export async function startServer() {
     // Starting the server
     await server.listen({ port: Number(port), host })
 
-    process.on('uncaughtException' || 'unhandledRejection', (err) => {
+    const handleError = (err: Error) => {
       logger.error(err)
       process.exit(1)
-    })
+    }
+
+    process.on('uncaughtException', handleError)
+    process.on('unhandledRejection', handleError)
   } catch (e) {
     logger.error(e)
   }
