@@ -4,7 +4,12 @@ on:
   schedule:
     # * is a special character in YAML, so you have to quote this string
     # https://crontab.guru/ (cron time is in UTC)
-    - cron:  '0 3 * * 1-5'
+    - cron: '0 3 * * 1-5'
+env:
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  GOOGLE_CLIENT_EMAIL: ${{ vars.GOOGLE_CLIENT_EMAIL }}
+  GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+
 jobs:
 
   # Build the application and run the tests
