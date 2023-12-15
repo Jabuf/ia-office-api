@@ -2,7 +2,9 @@ name: GitHub Actions Deploy to App Engine
 run-name: Deploying ${{ github.ref_name }} of ${{ github.repository }} on App Engine 🚀
 on: [ push ]
 env:
-  COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  GOOGLE_CLIENT_EMAIL: ${{ variables.GOOGLE_CLIENT_EMAIL }}
+  GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
 
 jobs:
 
