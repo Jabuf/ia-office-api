@@ -34,8 +34,8 @@ IA Office is an API that allow the generation of office files (docs, sheets, and
 
 ## Roadmap
 - [x] Add Docs generation
-- [ ] Dissociate Docs generation into mutliple templates
-- [ ] Split Sheets generation into multiple LLM interactions
+- [x] Dissociate Docs generation into mutliple templates
+- [x] Split Sheets generation into multiple LLM interactions
 - [ ] Implement Slides generation
 - [ ] Rework charts generation
 
